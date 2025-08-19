@@ -25,9 +25,11 @@ export default function getLevel(): LevelObject {
 
       { ropeContactPoint: { pos: Vector(100, -1500), radius: 40 } }, // Top level
       { ropeContactPoint: { pos: Vector(1000, -1500), radius: 40 } },
-
+      { pickup: { pos: Vector(100, -200) } },
+      { pickup: { pos: Vector(-500, -1500) } },
+      { pickup: { pos: Vector(500, -900) } },
       // Instructions
-      { text: { pos: Vector(-800, 300), text: "Swing up the tower!" } },
+      { text: { pos: Vector(-800, -160), text: "Swing up the tower!" } },
     ],
   };
 }

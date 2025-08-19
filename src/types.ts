@@ -25,4 +25,9 @@ export type MyGameObject = {
   box?: BoxProp;
   ropeContactPoint?: RopeContactPointProp;
   text?: TextProp;
+  pickup?: PickupProp;
+};
+
+export type PickupProp = {
+  pos: { x: number; y: number };
 };

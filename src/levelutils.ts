@@ -9,6 +9,8 @@ import { RopeContactPoint } from "./RopeContactPoint";
 import level1 from "./level1";
 import level2 from "./level2";
 import level3 from "./level3";
+import { Pickup } from "./Pickup";
+import { colorBlack } from "./colorUtils";
 
 // Keep an odd number of levels to make it work.
 const levels: Array<() => LevelObject> = [level1, level2, level3];
@@ -45,13 +47,15 @@ export function initLevel(
           object.ropeContactPoint.radius
         )
       );
+    } else if (object.pickup) {
+      gameObjects.push(new Pickup(object.pickup.pos));
     } else if (object.text) {
       const text = Text({
-        color: "#fff",
+        color: colorBlack,
         x: object.text.pos.x,
         y: object.text.pos.y,
         text: object.text.text,
-        font: "42px SF Pro",
+        font: "42px Impact",
         context: canvas.getContext("2d") as CanvasRenderingContext2D,
       });
       gameObjects.push(text);

@@ -13,7 +13,6 @@ import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
 import { handleCollision } from "./gameUtils";
 import { RopeContactPoint } from "./RopeContactPoint";
-import { Pickup } from "./Pickup";
 
 const { canvas } = init("g");
 const { canvas: transitionCanvas } = init("t");
@@ -209,7 +208,7 @@ async function startLevel(scene: SceneId = "l") {
   levelBackground = background; // Store the background
   _objects.splice(0, 0, _player);
   _objects.splice(0, 0, goal);
-  _objects.push(new Pickup(Vector(100, -200)));
+
   // todo cleanup existing objects
 
   gameHasStarted = true;

@@ -4,7 +4,7 @@ import { findClosestRopeContactPoint } from "./main";
 import { RopeContactPoint } from "./RopeContactPoint";
 import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
-import { colorAccent, colorCat } from "./colorUtils";
+import { colorAccent, colorBlack } from "./colorUtils";
 import { playRopeExtend } from "./audio";
 export type PlayerState = "d" | "a";
 
@@ -129,21 +129,23 @@ export class Player implements MyGameEntity {
       ctx.globalAlpha = 0.4;
     }
 
-    // Start at (0,0) - main cat body
+    // Start at (0,0) - main cat body using new SVG path
+    // Original path: M666,493C686.516,460.905 677.789,657.701 666.276,672.808C648.758,695.793 572.861,697.023 553,668.702C539.76,649.823 537.699,469.646 553,493C586.474,544.091 628.964,550.939 666,493
+    // Converted to start at (0,0), removed decimals, and shortened bottom by ~30px
     ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.bezierCurveTo(25, -34, 0, 135, 0, 135);
-    ctx.bezierCurveTo(-20, 165, -93, 170, -113, 135);
-    ctx.bezierCurveTo(-113, 135, -131, -33, -113, 0);
-    ctx.bezierCurveTo(-92, 38, -17, 38, 0, 0);
+    ctx.moveTo(0, 0); // Starting point at origin
+    ctx.bezierCurveTo(20, -32, 11, 134, 0, 149); // Reduced Y from 164,179 to 134,149 (moved up ~30px)
+    ctx.bezierCurveTo(-18, 172, -93, 174, -113, 145); // Reduced Y from 202,204,175 to 172,174,145 (moved up ~30px)
+    ctx.bezierCurveTo(-126, 126, -128, -24, -113, 0); // Reduced Y from 156 to 126 (moved up ~30px)
+    ctx.bezierCurveTo(-79, 41, -37, 48, 0, 0); // Reduced Y from 51,58 to 41,48 (moved up ~10px)
     ctx.closePath();
-    ctx.fillStyle = isBlackShadow ? "#000" : colorCat;
+    ctx.fillStyle = colorBlack;
     ctx.fill();
 
     // headband
     ctx.save();
-    ctx.fillStyle = isBlackShadow ? "#000" : colorAccent;
-    ctx.fillRect(-125, 45, 135, 41);
+    ctx.fillStyle = isBlackShadow ? colorBlack : colorAccent;
+    ctx.fillRect(-125, 45, 137, 41);
     ctx.restore();
 
     // Eyes on the headband
@@ -187,13 +189,13 @@ export class Player implements MyGameEntity {
         offsetY
       );
       ctx.closePath();
-      ctx.fillStyle = isBlackShadow ? "#000" : "#fff";
+      ctx.fillStyle = isBlackShadow ? colorBlack : "#fff";
       ctx.fill();
 
       // Pupil
       ctx.beginPath();
       ctx.arc(offsetX, offsetY, 6, 0, Math.PI * 2);
-      ctx.fillStyle = "#000";
+      ctx.fillStyle = colorBlack;
       ctx.fill();
     };
 
@@ -332,7 +334,7 @@ export class Player implements MyGameEntity {
 
     // Render thread shadow first
     context.globalAlpha = 0.8;
-    context.strokeStyle = "#000";
+    context.strokeStyle = colorBlack;
     context.lineWidth = 30; // 10 times larger than original (3 * 10)
     this.drawSpline(context, thread, 4, 4); // Shadow offset
 
@@ -522,7 +524,7 @@ export class Player implements MyGameEntity {
     // Render rope shadow first (8px down and left)
     context.save();
     context.globalAlpha = 0.4;
-    context.strokeStyle = "#000"; // Black shadow
+    context.strokeStyle = colorBlack; // Black shadow
     context.lineWidth = 25;
 
     context.beginPath();
@@ -533,7 +535,7 @@ export class Player implements MyGameEntity {
 
     // Render main rope
     context.save();
-    context.strokeStyle = colorCat; // Brown rope color
+    context.strokeStyle = colorBlack; // Brown rope color
     context.lineWidth = 25;
     context.beginPath();
     context.moveTo(ropeAttachPos.x, ropeAttachPos.y);

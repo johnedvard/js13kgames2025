@@ -1,7 +1,7 @@
 import { Vector } from "kontra";
 import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
-import { colorWall } from "./colorUtils";
+import { colorBlack, colorWall } from "./colorUtils";
 
 export class Box implements MyGameEntity {
   pos: Vector;
@@ -20,7 +20,7 @@ export class Box implements MyGameEntity {
 
     // Render shadow box behind the original (x+4, y+4 with 0.7 opacity)
     context.globalAlpha = 0.9;
-    context.fillStyle = "#000";
+    context.fillStyle = colorBlack;
     context.fillRect(this.pos.x + 14, this.pos.y + 14, this.width, this.height);
 
     // Render original box

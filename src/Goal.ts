@@ -2,6 +2,7 @@ import { Vector } from "kontra";
 import { Player } from "./Player";
 import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
+import { colorBlack } from "./colorUtils";
 
 export class Goal implements MyGameEntity {
   pos: Vector;
@@ -35,7 +36,7 @@ export class Goal implements MyGameEntity {
     context.fill();
 
     // Stroke with black
-    context.strokeStyle = "#000";
+    context.strokeStyle = colorBlack;
     context.lineWidth = 20;
     context.stroke();
 

@@ -1,7 +1,7 @@
 import { Vector } from "kontra";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
-import { colorAccent } from "./colorUtils";
+import { colorAccent, colorBlack } from "./colorUtils";
 import { playPickup } from "./audio";
 
 export class Pickup implements MyGameEntity {
@@ -60,7 +60,7 @@ export class Pickup implements MyGameEntity {
     }
     const drawStalk = () => {
       ctx.save();
-      ctx.strokeStyle = isBlackShadow ? "#000" : colorAccent;
+      ctx.strokeStyle = isBlackShadow ? colorBlack : colorAccent;
       ctx.lineWidth = 10;
 
       ctx.beginPath();
@@ -74,7 +74,7 @@ export class Pickup implements MyGameEntity {
       ctx.save();
       ctx.translate(offsetX, offsetY);
       ctx.rotate(rotation);
-      ctx.fillStyle = isBlackShadow ? "#000" : colorAccent;
+      ctx.fillStyle = isBlackShadow ? colorBlack : colorAccent;
       ctx.beginPath();
 
       const centerAdjustX = 3;

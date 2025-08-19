@@ -1,7 +1,7 @@
 import { Vector } from "kontra";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
-import { colorWall } from "./colorUtils";
+import { colorBlack, colorWall } from "./colorUtils";
 
 export class RopeContactPoint implements MyGameEntity {
   pos: Vector;
@@ -48,7 +48,7 @@ export class RopeContactPoint implements MyGameEntity {
 
     // Draw shadow for the inner circle (14px offset, black, 0.7 opacity)
     context.globalAlpha = 0.4;
-    context.fillStyle = "#000000"; // Black shadow
+    context.fillStyle = colorBlack;
     context.beginPath();
     context.arc(
       this.pos.x + 3,
