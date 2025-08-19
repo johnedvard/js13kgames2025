@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        height: 100vh;
+        padding: 0px;
+        margin: 0px;
+        overflow: hidden;
+        background: #6e2639;
+      }
+      canvas {
+        background: transparent;
+        width: 100%;
+        height: 100%;
+      }
+      body,
+      canvas {
+        touch-action: none;
+        user-select: none;
+      }
+      #b {
+        /* background: linear-gradient(to bottom, #35010f 30%, #000000 120%); */
+        background: #7e1f23;
+      }
+      #t,
+      #b {
+        pointer-events: none;
+      }
+    </style>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+  </head>
+  <body onContextMenu="return false" ondragstart="return false">
+    <canvas id="b"></canvas>
+    <canvas id="g"></canvas>
+    <canvas id="t"></canvas>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

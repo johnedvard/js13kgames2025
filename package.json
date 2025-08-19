@@ -1,0 +1,25 @@
+{
+  "name": "js13kgames2025",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:roadroller": "npm run build && npx roadroller dist/index.js -o dist/index.js",
+    "preview": "vite preview"
+  },
+  "author": "johnedvard@reitgames.com",
+  "description": "",
+  "devDependencies": {
+    "js13k-packer": "^1.0.2",
+    "roadroller": "^2.1.0",
+    "typescript": "^5.9.2",
+    "vite": "^6.3.5",
+    "vite-plugin-minify": "^2.1.0"
+  },
+  "dependencies": {
+    "kontra": "^10.0.2"
+  }
+}
