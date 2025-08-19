@@ -128,6 +128,9 @@ export function handleCollision(player: Player, objects: MyGameEntity[]): void {
       } else if (o.type === GameObjectType.Pickup) {
         // Handle pickup collision
         (o as Pickup).collect();
+      } else if (o.type === GameObjectType.Shuriken) {
+        // Handle shuriken collision
+        player.kill();
       }
     }
   }

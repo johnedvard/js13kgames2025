@@ -63,6 +63,11 @@ export class Player implements MyGameEntity {
     this.listenForEvents();
   }
 
+  kill() {
+    console.log("kill");
+    this.state = "d";
+  }
+
   private initializeCatBodyCache() {
     // Create an offscreen canvas to cache the normal cat body
     this.catBodyCanvas = new OffscreenCanvas(300, 300);

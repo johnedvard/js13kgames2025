@@ -6,14 +6,16 @@ import { LevelObject } from "./types";
 import { Player } from "./Player";
 import { Box } from "./Box";
 import { RopeContactPoint } from "./RopeContactPoint";
+import { Pickup } from "./Pickup";
+import { Shuriken } from "./Shuriken";
+import { colorBlack } from "./colorUtils";
 import level1 from "./level1";
 import level2 from "./level2";
 import level3 from "./level3";
-import { Pickup } from "./Pickup";
-import { colorBlack } from "./colorUtils";
+import level4 from "./level4";
 
 // Keep an odd number of levels to make it work.
-const levels: Array<() => LevelObject> = [level1, level2, level3];
+const levels: Array<() => LevelObject> = [level1, level2, level3, level4];
 
 export function numLevels() {
   return levels.length;
@@ -49,6 +51,8 @@ export function initLevel(
       );
     } else if (object.pickup) {
       gameObjects.push(new Pickup(object.pickup.pos));
+    } else if (object.shuriken) {
+      gameObjects.push(new Shuriken(object.shuriken.pos));
     } else if (object.text) {
       const text = Text({
         color: colorBlack,

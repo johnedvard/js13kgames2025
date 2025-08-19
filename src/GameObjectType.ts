@@ -5,4 +5,5 @@ export enum GameObjectType {
   RopeContactPoint = "r",
   Goal = "g",
   Pickup = "up",
+  Shuriken = "s",
 }

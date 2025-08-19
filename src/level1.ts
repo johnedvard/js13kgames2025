@@ -12,6 +12,7 @@ export default function getLevel(): LevelObject {
       // left wall
       { box: { pos: Vector(-500, -750), width: 200, height: 1100 } },
       { pickup: { pos: Vector(100, -200) } },
+
       { pickup: { pos: Vector(1100, -200) } },
       { pickup: { pos: Vector(2100, -200) } },
       // floor
