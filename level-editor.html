@@ -263,10 +263,28 @@
           if (this.currentTool === "select") {
             const obj = this.getObjectAt(x, y);
             if (obj) {
+              // Check if clicking on a resize handle of the currently selected box
+              if (
+                obj.type === "box" &&
+                this.selectedObject &&
+                this.selectedObject.type === "box" &&
+                this.selectedObject.ref === obj.ref
+              ) {
+                const handle = this.getResizeHandle(x, y, obj);
+                if (handle) {
+                  this.isResizing = true;
+                  this.resizeHandle = handle;
+                  this.selectedObject = obj;
+                  return;
+                }
+              }
+
               this.selectedObject = obj;
               this.isDragging = true;
               this.dragOffset.x = x - obj.x;
               this.dragOffset.y = y - obj.y;
+              this.isResizing = false;
+              this.resizeHandle = null;
 
               // Special handling for background points
               if (obj.type === "backgroundPoint") {
@@ -284,6 +302,8 @@
               this.selectedObject = null;
               this.selectedBackgroundPoint = null;
               this.backgroundPointIndex = -1;
+              this.isResizing = false;
+              this.resizeHandle = null;
             }
           } else if (this.currentTool === "background") {
             // Check if clicking on an existing background point
@@ -322,7 +342,16 @@
             "coordinates"
           ).textContent = `Mouse: (${Math.round(x)}, ${Math.round(y)})`;
 
-          if (this.isDragging && this.selectedObject) {
+          if (
+            this.isResizing &&
+            this.selectedObject &&
+            this.selectedObject.type === "box"
+          ) {
+            this.resizeObject(x, y);
+            this.updateObjectReference();
+            this.updatePropertyPanel();
+            this.render();
+          } else if (this.isDragging && this.selectedObject) {
             this.selectedObject.x = x - this.dragOffset.x;
             this.selectedObject.y = y - this.dragOffset.y;
             this.updateObjectReference();
@@ -332,7 +361,22 @@
         }
 
         onMouseUp(e) {
-          if (this.isDragging && this.selectedObject) {
+          if (this.isResizing && this.selectedObject) {
+            // Round dimensions to clean values when releasing mouse
+            this.selectedObject.x = Math.round(this.selectedObject.x);
+            this.selectedObject.y = Math.round(this.selectedObject.y);
+            this.selectedObject.width = Math.round(this.selectedObject.width);
+            this.selectedObject.height = Math.round(this.selectedObject.height);
+
+            // Update the object reference with rounded values
+            this.updateObjectReference();
+
+            // Update the property panel to show the new rounded values
+            this.updatePropertyPanel();
+
+            // Re-render with the new snapped dimensions
+            this.render();
+          } else if (this.isDragging && this.selectedObject) {
             // Round coordinates to clean values when releasing mouse
             this.selectedObject.x = Math.round(this.selectedObject.x);
             this.selectedObject.y = Math.round(this.selectedObject.y);
@@ -348,6 +392,8 @@
           }
 
           this.isDragging = false;
+          this.isResizing = false;
+          this.resizeHandle = null;
         }
 
         getObjectAt(x, y) {
@@ -516,6 +562,151 @@
           return Math.sqrt(dx * dx + dy * dy);
         }
 
+        drawResizeHandles(box) {
+          const handleSize = 8 / this.scale;
+          const x = box.x;
+          const y = box.y;
+          const w = box.width;
+          const h = box.height;
+
+          this.ctx.fillStyle = "#007bff";
+          this.ctx.strokeStyle = "#ffffff";
+          this.ctx.lineWidth = 2 / this.scale;
+
+          // Corner handles
+          const handles = [
+            { x: x, y: y, type: "nw" }, // Top-left
+            { x: x + w, y: y, type: "ne" }, // Top-right
+            { x: x + w, y: y + h, type: "se" }, // Bottom-right
+            { x: x, y: y + h, type: "sw" }, // Bottom-left
+            // Edge handles
+            { x: x + w / 2, y: y, type: "n" }, // Top
+            { x: x + w, y: y + h / 2, type: "e" }, // Right
+            { x: x + w / 2, y: y + h, type: "s" }, // Bottom
+            { x: x, y: y + h / 2, type: "w" }, // Left
+          ];
+
+          handles.forEach((handle) => {
+            this.ctx.fillRect(
+              handle.x - handleSize / 2,
+              handle.y - handleSize / 2,
+              handleSize,
+              handleSize
+            );
+            this.ctx.strokeRect(
+              handle.x - handleSize / 2,
+              handle.y - handleSize / 2,
+              handleSize,
+              handleSize
+            );
+          });
+        }
+
+        getResizeHandle(x, y, box) {
+          const handleSize = 8 / this.scale;
+          const bx = box.x;
+          const by = box.y;
+          const w = box.width;
+          const h = box.height;
+
+          const handles = [
+            { x: bx, y: by, type: "nw" },
+            { x: bx + w, y: by, type: "ne" },
+            { x: bx + w, y: by + h, type: "se" },
+            { x: bx, y: by + h, type: "sw" },
+            { x: bx + w / 2, y: by, type: "n" },
+            { x: bx + w, y: by + h / 2, type: "e" },
+            { x: bx + w / 2, y: by + h, type: "s" },
+            { x: bx, y: by + h / 2, type: "w" },
+          ];
+
+          for (let handle of handles) {
+            if (
+              x >= handle.x - handleSize / 2 &&
+              x <= handle.x + handleSize / 2 &&
+              y >= handle.y - handleSize / 2 &&
+              y <= handle.y + handleSize / 2
+            ) {
+              return handle.type;
+            }
+          }
+          return null;
+        }
+
+        resizeObject(mouseX, mouseY) {
+          const obj = this.selectedObject;
+          const handle = this.resizeHandle;
+
+          if (!obj || !handle) return;
+
+          const minSize = 10; // Minimum width/height
+
+          switch (handle) {
+            case "nw": // Top-left
+              const newWidth = obj.x + obj.width - mouseX;
+              const newHeight = obj.y + obj.height - mouseY;
+              if (newWidth >= minSize && newHeight >= minSize) {
+                obj.width = newWidth;
+                obj.height = newHeight;
+                obj.x = mouseX;
+                obj.y = mouseY;
+              }
+              break;
+            case "ne": // Top-right
+              const neWidth = mouseX - obj.x;
+              const neHeight = obj.y + obj.height - mouseY;
+              if (neWidth >= minSize && neHeight >= minSize) {
+                obj.width = neWidth;
+                obj.height = neHeight;
+                obj.y = mouseY;
+              }
+              break;
+            case "se": // Bottom-right
+              const seWidth = mouseX - obj.x;
+              const seHeight = mouseY - obj.y;
+              if (seWidth >= minSize && seHeight >= minSize) {
+                obj.width = seWidth;
+                obj.height = seHeight;
+              }
+              break;
+            case "sw": // Bottom-left
+              const swWidth = obj.x + obj.width - mouseX;
+              const swHeight = mouseY - obj.y;
+              if (swWidth >= minSize && swHeight >= minSize) {
+                obj.width = swWidth;
+                obj.height = swHeight;
+                obj.x = mouseX;
+              }
+              break;
+            case "n": // Top
+              const nHeight = obj.y + obj.height - mouseY;
+              if (nHeight >= minSize) {
+                obj.height = nHeight;
+                obj.y = mouseY;
+              }
+              break;
+            case "s": // Bottom
+              const sHeight = mouseY - obj.y;
+              if (sHeight >= minSize) {
+                obj.height = sHeight;
+              }
+              break;
+            case "e": // Right
+              const eWidth = mouseX - obj.x;
+              if (eWidth >= minSize) {
+                obj.width = eWidth;
+              }
+              break;
+            case "w": // Left
+              const wWidth = obj.x + obj.width - mouseX;
+              if (wWidth >= minSize) {
+                obj.width = wWidth;
+                obj.x = mouseX;
+              }
+              break;
+          }
+        }
+
         placeObject(x, y) {
           switch (this.currentTool) {
             case "player":
@@ -526,7 +717,7 @@
               break;
             case "box":
               this.level.objects.push({
-                box: { pos: { x, y }, width: 100, height: 50 },
+                box: { pos: { x, y }, width: 200, height: 200 },
                 zIndex: 0, // Default z-index for rendering order
               });
               break;
@@ -904,6 +1095,9 @@
                 this.selectedObject.width + 4,
                 this.selectedObject.height + 4
               );
+
+              // Draw resize handles for boxes
+              this.drawResizeHandles(this.selectedObject);
             } else {
               const radius =
                 this.selectedObject.type === "goal"
