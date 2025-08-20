@@ -19,12 +19,13 @@ import level7 from "./level7";
 
 // Keep an odd number of levels to make it work.
 const levels: Array<() => LevelObject> = [
-  level7,
+  level1,
   level2,
   level3,
   level4,
   level5,
   level6,
+  level7,
 ];
 
 export function numLevels() {
