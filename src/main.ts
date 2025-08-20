@@ -56,7 +56,12 @@ on(GameEvent.play, ({ levelId, levelData }: any) => {
 on(GameEvent.kill, () => {
   if (_player && _player.state === "a") {
     _player.state = "d"; // Set player state to dead
+    handlePlayerDead();
   }
+});
+
+on(GameEvent.goal, () => {
+  handleLevelClear();
 });
 
 function highlightClosestRopeContactPoint() {
@@ -89,7 +94,6 @@ const mainLoop = GameLoop({
       camera?.follow(_player, { offset: Vector(100, 100), lerp: true });
       // consider not adding levelpersitent objects to the collision detection
       handleCollision(_player, [..._objects, ...levelPersistentObjects]);
-      handleLevelClear();
       highlightClosestRopeContactPoint();
     }
   },
@@ -214,7 +218,7 @@ async function startLevel(scene: SceneId = "l") {
   _objects = gameObjects;
   levelBackground = background; // Store the background
   _objects.splice(0, 0, _player);
-  _objects.splice(0, 0, goal);
+  _objects.splice(0, 0, _goal);
 
   // todo cleanup existing objects
 
@@ -222,8 +226,7 @@ async function startLevel(scene: SceneId = "l") {
   mainLoop.start(); // start the game
 }
 
-function handleLevelClear() {
-  if (isDisplayingLevelClearScreen || isDisplayingPlayerDiedScreen) return;
+function handlePlayerDead() {
   if (_player.state === "d") {
     isDisplayingPlayerDiedScreen = true;
 
@@ -234,7 +237,11 @@ function handleLevelClear() {
       startLevel("l");
     }, 150);
   }
-  if (_goal.checkIfGoalReached(_player) && !isDisplayingLevelClearScreen) {
+}
+
+function handleLevelClear() {
+  if (isDisplayingLevelClearScreen || isDisplayingPlayerDiedScreen) return;
+  if (!isDisplayingLevelClearScreen) {
     playGoal();
 
     isDisplayingLevelClearScreen = true;

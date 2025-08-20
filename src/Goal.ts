@@ -1,5 +1,4 @@
 import { Vector } from "kontra";
-import { Player } from "./Player";
 import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
 import { colorBlack } from "./colorUtils";
@@ -7,6 +6,8 @@ import { colorBlack } from "./colorUtils";
 export class Goal implements MyGameEntity {
   pos: Vector;
   type = GameObjectType.Goal;
+  width: number = 200;
+  height: number = 300;
   private alpha: number = 1;
   private radiusX = 100;
   private radiusY = 150;
@@ -41,15 +42,5 @@ export class Goal implements MyGameEntity {
     context.stroke();
 
     context.restore();
-  }
-
-  checkIfGoalReached(player: Player) {
-    // Check if point is inside ellipse using the ellipse equation
-    const dx = player.pos.x - this.pos.x;
-    const dy = player.pos.y - this.pos.y;
-    const ellipseTest =
-      (dx * dx) / (this.radiusX * this.radiusX * 2) +
-      (dy * dy) / (this.radiusY * this.radiusY * 2);
-    return ellipseTest <= 1;
   }
 }

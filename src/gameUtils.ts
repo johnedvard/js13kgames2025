@@ -2,8 +2,9 @@ import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
 import { Player } from "./Player";
 import { Box } from "./Box";
-import { Vector } from "kontra";
+import { emit, Vector } from "kontra";
 import { Pickup } from "./Pickup";
+import { GameEvent } from "./GameEvent";
 
 // Circle to rectangle collision detection helper
 function isCircleRectangleColliding(
@@ -126,11 +127,11 @@ export function handleCollision(player: Player, objects: MyGameEntity[]): void {
       if (o.type === GameObjectType.Platform) {
         resolveCircleRectangleCollision(player, o as Box);
       } else if (o.type === GameObjectType.Pickup) {
-        // Handle pickup collision
         (o as Pickup).collect();
       } else if (o.type === GameObjectType.Shuriken) {
-        // Handle shuriken collision
-        player.kill();
+        emit(GameEvent.kill);
+      } else if (o.type === GameObjectType.Goal) {
+        emit(GameEvent.goal);
       }
     }
   }
