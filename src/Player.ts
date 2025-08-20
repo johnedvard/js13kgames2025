@@ -255,19 +255,20 @@ export class Player implements MyGameEntity {
     const speedThreshold = 8; // Only boost if speed is below this threshold
 
     if (currentSpeed < speedThreshold) {
-      const directionToGrapple = closestRopeContactPoint.pos
-        .subtract(ropeAttachPos)
-        .normalize();
-
       // Calculate boost amount based on how slow the player is moving
       const speedDeficit = speedThreshold - currentSpeed;
       const boostMultiplier = speedDeficit / speedThreshold; // 0 to 1, higher when slower
-      const baseBoostSpeed = 15;
+      const baseBoostSpeed = 9; // Base speed boost amount
       const actualBoostSpeed = baseBoostSpeed * boostMultiplier;
 
-      // Add velocity in the direction towards the grapple point
+      // Determine horizontal direction to the grapple point
+      const deltaToGrapple =
+        closestRopeContactPoint.pos.subtract(ropeAttachPos);
+
+      // Add velocity only in horizontal direction (+x or -x)
+      const horizontalDirection = Math.sign(deltaToGrapple.x); // -1 for left, +1 for right
       this.velocity = this.velocity.add(
-        directionToGrapple.scale(actualBoostSpeed)
+        Vector(horizontalDirection * actualBoostSpeed, 0)
       );
     }
   };
