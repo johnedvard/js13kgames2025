@@ -1,11 +1,17 @@
 import { Vector } from "kontra";
-import { Shuriken } from "./Shuriken";
 
 export default function getLevel() {
   return {
     playerPos: Vector(400, -500),
     goalPos: Vector(-100, 120),
-    background: { pos: Vector(-490, -940), width: 1100 * 3 - 20, height: 1100 },
+    background: {
+      positions: [
+        Vector(-490, -940),
+        Vector(-490 + 1100 * 3 - 20, -940),
+        Vector(-490 + 1100 * 3 - 20, -940 + 1100),
+        Vector(-490, -940 + 1100),
+      ],
+    },
     objects: [
       // ceiling wall
       { box: { pos: Vector(-500, -950), width: 1100 * 3, height: 200 } },

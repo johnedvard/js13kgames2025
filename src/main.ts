@@ -114,28 +114,35 @@ const mainLoop = GameLoop({
 
 function renderBackgrounds(context: CanvasRenderingContext2D) {
   // Render the level background if it exists
-  if (levelBackground) {
+  if (
+    levelBackground &&
+    levelBackground.positions &&
+    levelBackground.positions.length > 0
+  ) {
     context.save();
 
-    // Create a vertical gradient from sky blue to light brown
-    const gradient = context.createLinearGradient(
-      levelBackground.pos.x,
-      levelBackground.pos.y,
-      levelBackground.pos.x,
-      levelBackground.pos.y + levelBackground.height
-    );
+    // Create a vertical gradient - we'll use the bounding box of the polygon
+    const positions = levelBackground.positions;
+    const minY = Math.min(...positions.map((p: any) => p.y));
+    const maxY = Math.max(...positions.map((p: any) => p.y));
+    const minX = Math.min(...positions.map((p: any) => p.x));
+
+    const gradient = context.createLinearGradient(minX, minY, minX, maxY);
     gradient.addColorStop(0, "#D3D3D3"); // lightgray
     gradient.addColorStop(1, "#A9A9A9"); // darkgray
-    // gradient.addColorStop(0, "#39707a"); // lightgray
-    // gradient.addColorStop(1, "#23495d"); // darkgray
 
     context.fillStyle = gradient;
-    context.fillRect(
-      levelBackground.pos.x,
-      levelBackground.pos.y,
-      levelBackground.width,
-      levelBackground.height
-    );
+
+    // Draw the polygon using the positions array
+    context.beginPath();
+    context.moveTo(positions[0].x, positions[0].y);
+
+    for (let i = 1; i < positions.length; i++) {
+      context.lineTo(positions[i].x, positions[i].y);
+    }
+
+    context.closePath();
+    context.fill();
 
     context.restore();
   }

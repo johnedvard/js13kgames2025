@@ -5,7 +5,14 @@ export default function getLevel(): LevelObject {
   return {
     playerPos: Vector(0, -500),
     goalPos: Vector(2415, 120),
-    background: { pos: Vector(-490, -940), width: 1100 * 3 - 20, height: 1100 },
+    background: {
+      positions: [
+        Vector(-490, -940),
+        Vector(-490 + 1100 * 3 - 20, -940),
+        Vector(-490 + 1100 * 3 - 20, -940 + 1100),
+        Vector(-490, -940 + 1100),
+      ],
+    },
     objects: [
       // ceiling wall
       { box: { pos: Vector(-500, -950), width: 1100 * 3, height: 200 } },

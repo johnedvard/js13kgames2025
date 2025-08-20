@@ -2,7 +2,11 @@ export type LevelObject = {
   playerPos: { x: number; y: number };
   goalPos: { x: number; y: number };
   objects: MyGameObject[];
-  background?: BoxProp;
+  background?: BackgroundProp;
+};
+
+export type BackgroundProp = {
+  positions: { x: number; y: number }[];
 };
 
 export type BoxProp = {

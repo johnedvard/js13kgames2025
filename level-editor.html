@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level Editor</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background: #f0f0f0;
+      }
+
+      .container {
+        display: flex;
+        gap: 20px;
+      }
+
+      .editor-panel {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        height: fit-content;
+      }
+
+      .canvas-container {
+        flex: 1;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+      }
+
+      canvas {
+        border: 2px solid #ccc;
+        cursor: crosshair;
+      }
+
+      .tool-group {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .tool-group h3 {
+        margin: 0 0 10px 0;
+        color: #333;
+      }
+
+      .tool-button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 2px solid #ddd;
+        background: white;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .tool-button:hover {
+        background: #f0f0f0;
+      }
+
+      .tool-button.active {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+      }
+
+      .property-input {
+        display: block;
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+
+      .export-button {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .export-button:hover {
+        background: #218838;
+      }
+
+      .selected {
+        box-shadow: 0 0 0 3px #007bff;
+      }
+
+      .coordinates {
+        font-size: 12px;
+        color: #666;
+        margin-top: 10px;
+      }
+
+      textarea {
+        width: 100%;
+        height: 200px;
+        font-family: monospace;
+        font-size: 12px;
+        resize: vertical;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="editor-panel">
+        <h2>Level Editor</h2>
+
+        <div class="tool-group">
+          <h3>Tools</h3>
+          <button class="tool-button active" data-tool="select">
+            Select / Move
+          </button>
+          <button class="tool-button" data-tool="box">Add Box</button>
+          <button class="tool-button" data-tool="player">Place Player</button>
+          <button class="tool-button" data-tool="goal">Place Goal</button>
+          <button class="tool-button" data-tool="pickup">Add Pickup</button>
+          <button class="tool-button" data-tool="shuriken">Add Shuriken</button>
+          <button class="tool-button" data-tool="rope">Add Rope Point</button>
+          <button class="tool-button" data-tool="background">
+            Edit Background
+          </button>
+        </div>
+
+        <div class="tool-group" id="properties">
+          <h3>Properties</h3>
+          <div id="property-fields"></div>
+        </div>
+
+        <div class="tool-group">
+          <h3>Actions</h3>
+          <button class="tool-button" onclick="deleteSelected()">
+            Delete Selected
+          </button>
+          <button class="tool-button" onclick="clearLevel()">
+            Clear Level
+          </button>
+        </div>
+
+        <div class="coordinates" id="coordinates">Mouse: (0, 0)</div>
+
+        <button class="export-button" onclick="exportLevel()">
+          Export Level
+        </button>
+
+        <button
+          class="export-button"
+          onclick="importLevel()"
+          style="background: #007bff; margin-top: 5px"
+        >
+          Import Level
+        </button>
+
+        <div class="tool-group">
+          <h3>Generated Code</h3>
+          <textarea
+            id="output"
+            placeholder="Paste level code here to import, or generate code by clicking Export Level..."
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="canvas-container">
+        <canvas id="canvas" width="1200" height="800"></canvas>
+      </div>
+    </div>
+
+    <script>
+      class LevelEditor {
+        constructor() {
+          this.canvas = document.getElementById("canvas");
+          this.ctx = this.canvas.getContext("2d");
+          this.currentTool = "select";
+          this.selectedObject = null;
+          this.isDragging = false;
+          this.dragOffset = { x: 0, y: 0 };
+          this.isResizing = false;
+          this.resizeHandle = null;
+          this.scale = 0.25; // Make 1 unit appear 4x smaller (0.25x scale)
+          this.selectedBackgroundPoint = null; // For background editing
+          this.backgroundPointIndex = -1; // Index of selected background point
+
+          this.level = {
+            playerPos: { x: 100, y: 400 },
+            goalPos: { x: 1000, y: 400 },
+            background: {
+              positions: [
+                { x: 100, y: 100 },
+                { x: 1300, y: 100 },
+                { x: 1300, y: 900 },
+                { x: 100, y: 900 },
+              ],
+            },
+            objects: [],
+          };
+
+          this.setupEventListeners();
+          this.render();
+        }
+        setupEventListeners() {
+          this.canvas.addEventListener(
+            "mousedown",
+            this.onMouseDown.bind(this)
+          );
+          this.canvas.addEventListener(
+            "mousemove",
+            this.onMouseMove.bind(this)
+          );
+          this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this));
+
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Delete" && this.selectedObject) {
+              this.deleteSelected();
+            }
+          });
+
+          document.querySelectorAll(".tool-button").forEach((button) => {
+            button.addEventListener("click", (e) => {
+              if (e.target.dataset.tool) {
+                this.setTool(e.target.dataset.tool);
+              }
+            });
+          });
+        }
+
+        setTool(tool) {
+          this.currentTool = tool;
+          this.selectedObject = null;
+          document.querySelectorAll(".tool-button").forEach((btn) => {
+            btn.classList.remove("active");
+          });
+          document
+            .querySelector(`[data-tool="${tool}"]`)
+            .classList.add("active");
+          this.updatePropertyPanel();
+          this.render();
+        }
+
+        onMouseDown(e) {
+          const rect = this.canvas.getBoundingClientRect();
+          const canvasX = e.clientX - rect.left;
+          const canvasY = e.clientY - rect.top;
+          // Convert canvas coordinates to world coordinates
+          const x = canvasX / this.scale;
+          const y = canvasY / this.scale;
+
+          if (this.currentTool === "select") {
+            const obj = this.getObjectAt(x, y);
+            if (obj) {
+              this.selectedObject = obj;
+              this.isDragging = true;
+              this.dragOffset.x = x - obj.x;
+              this.dragOffset.y = y - obj.y;
+
+              // Special handling for background points
+              if (obj.type === "backgroundPoint") {
+                this.selectedBackgroundPoint = this.level.background;
+                // Find the point index
+                this.backgroundPointIndex =
+                  this.level.background.positions.findIndex(
+                    (pos) => pos.x === obj.x && pos.y === obj.y
+                  );
+              } else {
+                this.selectedBackgroundPoint = null;
+                this.backgroundPointIndex = -1;
+              }
+            } else {
+              this.selectedObject = null;
+              this.selectedBackgroundPoint = null;
+              this.backgroundPointIndex = -1;
+            }
+          } else if (this.currentTool === "background") {
+            // Check if clicking on an existing background point
+            const obj = this.getObjectAt(x, y);
+            if (obj && obj.type === "backgroundPoint") {
+              this.selectedObject = obj;
+              this.isDragging = true;
+              this.dragOffset.x = x - obj.x;
+              this.dragOffset.y = y - obj.y;
+              this.selectedBackgroundPoint = this.level.background;
+              this.backgroundPointIndex =
+                this.level.background.positions.findIndex(
+                  (pos) => pos.x === obj.x && pos.y === obj.y
+                );
+            } else {
+              // Place a new background point
+              this.placeObject(x, y);
+            }
+          } else {
+            this.placeObject(x, y);
+          }
+
+          this.updatePropertyPanel();
+          this.render();
+        }
+
+        onMouseMove(e) {
+          const rect = this.canvas.getBoundingClientRect();
+          const canvasX = e.clientX - rect.left;
+          const canvasY = e.clientY - rect.top;
+          // Convert canvas coordinates to world coordinates
+          const x = canvasX / this.scale;
+          const y = canvasY / this.scale;
+
+          document.getElementById(
+            "coordinates"
+          ).textContent = `Mouse: (${Math.round(x)}, ${Math.round(y)})`;
+
+          if (this.isDragging && this.selectedObject) {
+            this.selectedObject.x = x - this.dragOffset.x;
+            this.selectedObject.y = y - this.dragOffset.y;
+            this.updateObjectReference();
+            this.updatePropertyPanel();
+            this.render();
+          }
+        }
+
+        onMouseUp(e) {
+          if (this.isDragging && this.selectedObject) {
+            // Round coordinates to clean values when releasing mouse
+            this.selectedObject.x = Math.round(this.selectedObject.x);
+            this.selectedObject.y = Math.round(this.selectedObject.y);
+
+            // Update the object reference with rounded values
+            this.updateObjectReference();
+
+            // Update the property panel to show the new rounded values
+            this.updatePropertyPanel();
+
+            // Re-render with the new snapped position
+            this.render();
+          }
+
+          this.isDragging = false;
+        }
+
+        getObjectAt(x, y) {
+          // Check background points first when in background edit mode for priority selection
+          if (this.currentTool === "background") {
+            if (this.level.background && this.level.background.positions) {
+              for (let i = 0; i < this.level.background.positions.length; i++) {
+                const pos = this.level.background.positions[i];
+                if (this.isPointInCircle(x, y, pos.x, pos.y, 15)) {
+                  return {
+                    type: "backgroundPoint",
+                    x: pos.x,
+                    y: pos.y,
+                  };
+                }
+              }
+            }
+          }
+
+          // Check player
+          if (
+            this.isPointInCircle(
+              x,
+              y,
+              this.level.playerPos.x,
+              this.level.playerPos.y,
+              20
+            )
+          ) {
+            return { type: "player", ...this.level.playerPos };
+          }
+
+          // Check goal
+          if (
+            this.isPointInCircle(
+              x,
+              y,
+              this.level.goalPos.x,
+              this.level.goalPos.y,
+              30
+            )
+          ) {
+            return { type: "goal", ...this.level.goalPos };
+          }
+
+          // Check objects
+          for (let obj of this.level.objects) {
+            if (
+              obj.box &&
+              this.isPointInRect(
+                x,
+                y,
+                obj.box.pos.x,
+                obj.box.pos.y,
+                obj.box.width,
+                obj.box.height
+              )
+            ) {
+              return {
+                type: "box",
+                ...obj.box.pos,
+                width: obj.box.width,
+                height: obj.box.height,
+                zIndex: obj.zIndex || 0,
+                ref: obj,
+              };
+            }
+            if (
+              obj.pickup &&
+              this.isPointInCircle(x, y, obj.pickup.pos.x, obj.pickup.pos.y, 15)
+            ) {
+              return { type: "pickup", ...obj.pickup.pos, ref: obj };
+            }
+            if (
+              obj.shuriken &&
+              this.isPointInCircle(
+                x,
+                y,
+                obj.shuriken.pos.x,
+                obj.shuriken.pos.y,
+                20
+              )
+            ) {
+              return { type: "shuriken", ...obj.shuriken.pos, ref: obj };
+            }
+            if (
+              obj.ropeContactPoint &&
+              this.isPointInCircle(
+                x,
+                y,
+                obj.ropeContactPoint.pos.x,
+                obj.ropeContactPoint.pos.y,
+                obj.ropeContactPoint.radius || 20
+              )
+            ) {
+              return {
+                type: "rope",
+                ...obj.ropeContactPoint.pos,
+                radius: obj.ropeContactPoint.radius,
+                ref: obj,
+              };
+            }
+          }
+
+          // Check background points (only when in select mode, since background mode already checked above)
+          if (this.currentTool === "select") {
+            if (this.level.background && this.level.background.positions) {
+              for (let i = 0; i < this.level.background.positions.length; i++) {
+                const pos = this.level.background.positions[i];
+                if (this.isPointInCircle(x, y, pos.x, pos.y, 15)) {
+                  return {
+                    type: "backgroundPoint",
+                    x: pos.x,
+                    y: pos.y,
+                  };
+                }
+              }
+            }
+          }
+
+          return null;
+        }
+
+        isPointInRect(px, py, x, y, w, h) {
+          return px >= x && px <= x + w && py >= y && py <= y + h;
+        }
+
+        isPointInCircle(px, py, cx, cy, r) {
+          const dx = px - cx;
+          const dy = py - cy;
+          return dx * dx + dy * dy <= r * r;
+        }
+
+        distanceToLineSegment(px, py, x1, y1, x2, y2) {
+          // Calculate distance from point (px, py) to line segment (x1, y1) to (x2, y2)
+          const A = px - x1;
+          const B = py - y1;
+          const C = x2 - x1;
+          const D = y2 - y1;
+
+          const dot = A * C + B * D;
+          const lenSq = C * C + D * D;
+
+          if (lenSq === 0) {
+            // Line segment is actually a point
+            return Math.sqrt(A * A + B * B);
+          }
+
+          let param = dot / lenSq;
+
+          let xx, yy;
+
+          if (param < 0) {
+            xx = x1;
+            yy = y1;
+          } else if (param > 1) {
+            xx = x2;
+            yy = y2;
+          } else {
+            xx = x1 + param * C;
+            yy = y1 + param * D;
+          }
+
+          const dx = px - xx;
+          const dy = py - yy;
+          return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        placeObject(x, y) {
+          switch (this.currentTool) {
+            case "player":
+              this.level.playerPos = { x, y };
+              break;
+            case "goal":
+              this.level.goalPos = { x, y };
+              break;
+            case "box":
+              this.level.objects.push({
+                box: { pos: { x, y }, width: 100, height: 50 },
+                zIndex: 0, // Default z-index for rendering order
+              });
+              break;
+            case "pickup":
+              this.level.objects.push({
+                pickup: { pos: { x, y } },
+              });
+              break;
+            case "shuriken":
+              this.level.objects.push({
+                shuriken: { pos: { x, y } },
+              });
+              break;
+            case "rope":
+              this.level.objects.push({
+                ropeContactPoint: { pos: { x, y }, radius: 40 },
+              });
+              break;
+            case "background":
+              // Add a new point to the background polygon
+              if (!this.level.background) {
+                this.level.background = { positions: [] };
+              }
+              if (!this.level.background.positions) {
+                this.level.background.positions = [];
+              }
+
+              // Find the best position to insert the new point
+              const positions = this.level.background.positions;
+              if (positions.length < 2) {
+                // If we have 0 or 1 points, just add to the end
+                positions.push({ x, y });
+              } else {
+                // Find the edge that's closest to the new point
+                let bestIndex = positions.length; // Default to end
+                let minDistance = Infinity;
+
+                for (let i = 0; i < positions.length; i++) {
+                  const p1 = positions[i];
+                  const p2 = positions[(i + 1) % positions.length]; // Next point (wrapping to start)
+
+                  // Calculate distance from point to line segment
+                  const distance = this.distanceToLineSegment(
+                    x,
+                    y,
+                    p1.x,
+                    p1.y,
+                    p2.x,
+                    p2.y
+                  );
+
+                  if (distance < minDistance) {
+                    minDistance = distance;
+                    bestIndex = i + 1; // Insert after point i
+                  }
+                }
+
+                // Insert the point at the best position
+                positions.splice(bestIndex, 0, { x, y });
+              }
+              break;
+          }
+          this.render();
+        }
+
+        updatePropertyPanel() {
+          const panel = document.getElementById("property-fields");
+          panel.innerHTML = "";
+
+          if (!this.selectedObject) return;
+
+          const createInput = (label, value, callback) => {
+            const input = document.createElement("input");
+            input.type = "number";
+            input.className = "property-input";
+            input.placeholder = label;
+            input.value = value;
+            input.addEventListener("input", callback);
+
+            const labelEl = document.createElement("label");
+            labelEl.textContent = label;
+
+            panel.appendChild(labelEl);
+            panel.appendChild(input);
+          };
+
+          createInput("X", this.selectedObject.x, (e) => {
+            this.selectedObject.x = parseFloat(e.target.value) || 0;
+            this.updateObjectReference();
+            this.render();
+          });
+
+          createInput("Y", this.selectedObject.y, (e) => {
+            this.selectedObject.y = parseFloat(e.target.value) || 0;
+            this.updateObjectReference();
+            this.render();
+          });
+
+          if (this.selectedObject.type === "box") {
+            createInput("Width", this.selectedObject.width, (e) => {
+              this.selectedObject.width = parseFloat(e.target.value) || 1;
+              this.updateObjectReference();
+              this.render();
+            });
+
+            createInput("Height", this.selectedObject.height, (e) => {
+              this.selectedObject.height = parseFloat(e.target.value) || 1;
+              this.updateObjectReference();
+              this.render();
+            });
+
+            createInput("Z-Index", this.selectedObject.zIndex || 0, (e) => {
+              this.selectedObject.zIndex = parseInt(e.target.value) || 0;
+              this.updateObjectReference();
+              this.render();
+            });
+          }
+
+          if (this.selectedObject.type === "rope") {
+            createInput("Radius", this.selectedObject.radius, (e) => {
+              this.selectedObject.radius = parseFloat(e.target.value) || 20;
+              this.updateObjectReference();
+              this.render();
+            });
+          }
+
+          if (this.selectedObject.type === "backgroundPoint") {
+            // Add delete button for background points
+            const deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "Delete Point";
+            deleteBtn.onclick = () => {
+              if (
+                this.selectedBackgroundPoint &&
+                this.backgroundPointIndex !== -1
+              ) {
+                this.selectedBackgroundPoint.positions.splice(
+                  this.backgroundPointIndex,
+                  1
+                );
+                this.selectedObject = null;
+                this.selectedBackgroundPoint = null;
+                this.backgroundPointIndex = -1;
+                this.updatePropertyPanel();
+                this.render();
+              }
+            };
+            panel.appendChild(deleteBtn);
+          }
+        }
+
+        updateObjectReference() {
+          if (this.selectedObject.type === "player") {
+            this.level.playerPos.x = this.selectedObject.x;
+            this.level.playerPos.y = this.selectedObject.y;
+          } else if (this.selectedObject.type === "goal") {
+            this.level.goalPos.x = this.selectedObject.x;
+            this.level.goalPos.y = this.selectedObject.y;
+          } else if (this.selectedObject.type === "backgroundPoint") {
+            // Update background point coordinates
+            if (
+              this.selectedBackgroundPoint &&
+              this.backgroundPointIndex !== -1
+            ) {
+              this.selectedBackgroundPoint.positions[
+                this.backgroundPointIndex
+              ].x = this.selectedObject.x;
+              this.selectedBackgroundPoint.positions[
+                this.backgroundPointIndex
+              ].y = this.selectedObject.y;
+            }
+          } else if (this.selectedObject.ref) {
+            const ref = this.selectedObject.ref;
+            if (ref.box) {
+              ref.box.pos.x = this.selectedObject.x;
+              ref.box.pos.y = this.selectedObject.y;
+              ref.box.width = this.selectedObject.width;
+              ref.box.height = this.selectedObject.height;
+              ref.zIndex = this.selectedObject.zIndex;
+            } else if (ref.pickup) {
+              ref.pickup.pos.x = this.selectedObject.x;
+              ref.pickup.pos.y = this.selectedObject.y;
+            } else if (ref.shuriken) {
+              ref.shuriken.pos.x = this.selectedObject.x;
+              ref.shuriken.pos.y = this.selectedObject.y;
+            } else if (ref.ropeContactPoint) {
+              ref.ropeContactPoint.pos.x = this.selectedObject.x;
+              ref.ropeContactPoint.pos.y = this.selectedObject.y;
+              ref.ropeContactPoint.radius = this.selectedObject.radius;
+            }
+          }
+        }
+
+        render() {
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+          // Save context and apply scale
+          this.ctx.save();
+          this.ctx.scale(this.scale, this.scale);
+
+          // Draw grid (in world coordinates)
+          this.ctx.strokeStyle = "#f0f0f0";
+          this.ctx.lineWidth = 1 / this.scale; // Adjust line width for scale
+          const gridSize = 50 / this.scale; // Grid every 50 world units
+          const maxX = this.canvas.width / this.scale;
+          const maxY = this.canvas.height / this.scale;
+
+          for (let x = 0; x < maxX; x += gridSize) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, 0);
+            this.ctx.lineTo(x, maxY);
+            this.ctx.stroke();
+          }
+          for (let y = 0; y < maxY; y += gridSize) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, y);
+            this.ctx.lineTo(maxX, y);
+            this.ctx.stroke();
+          }
+
+          // Draw objects (sorted by z-index for proper layering)
+          const sortedObjects = [...this.level.objects].sort((a, b) => {
+            const aZ = a.zIndex || 0;
+            const bZ = b.zIndex || 0;
+            return aZ - bZ;
+          });
+
+          sortedObjects.forEach((obj) => {
+            if (obj.box) {
+              this.ctx.fillStyle = "#8B4513";
+              this.ctx.fillRect(
+                obj.box.pos.x,
+                obj.box.pos.y,
+                obj.box.width,
+                obj.box.height
+              );
+              this.ctx.strokeStyle = "black";
+              this.ctx.lineWidth = 2 / this.scale;
+              this.ctx.strokeRect(
+                obj.box.pos.x,
+                obj.box.pos.y,
+                obj.box.width,
+                obj.box.height
+              );
+            }
+
+            if (obj.pickup) {
+              this.ctx.fillStyle = "#00ff00";
+              this.ctx.beginPath();
+              this.ctx.arc(
+                obj.pickup.pos.x,
+                obj.pickup.pos.y,
+                15,
+                0,
+                Math.PI * 2
+              );
+              this.ctx.fill();
+              this.ctx.strokeStyle = "black";
+              this.ctx.lineWidth = 2 / this.scale;
+              this.ctx.stroke();
+            }
+
+            if (obj.shuriken) {
+              this.ctx.fillStyle = "#ff00ff";
+              this.ctx.beginPath();
+              this.ctx.arc(
+                obj.shuriken.pos.x,
+                obj.shuriken.pos.y,
+                20,
+                0,
+                Math.PI * 2
+              );
+              this.ctx.fill();
+              this.ctx.strokeStyle = "black";
+              this.ctx.lineWidth = 2 / this.scale;
+              this.ctx.stroke();
+            }
+
+            if (obj.ropeContactPoint) {
+              this.ctx.fillStyle = "#8B4513";
+              this.ctx.beginPath();
+              this.ctx.arc(
+                obj.ropeContactPoint.pos.x,
+                obj.ropeContactPoint.pos.y,
+                obj.ropeContactPoint.radius,
+                0,
+                Math.PI * 2
+              );
+              this.ctx.fill();
+              this.ctx.strokeStyle = "black";
+              this.ctx.lineWidth = 2 / this.scale;
+              this.ctx.stroke();
+            }
+          });
+
+          // Draw player
+          this.ctx.strokeStyle = "black";
+          this.ctx.lineWidth = 3 / this.scale;
+          this.ctx.beginPath();
+          this.ctx.arc(
+            this.level.playerPos.x,
+            this.level.playerPos.y,
+            20,
+            0,
+            Math.PI * 2
+          );
+          this.ctx.stroke();
+
+          // Draw goal
+          this.ctx.fillStyle = "white";
+          this.ctx.beginPath();
+          this.ctx.arc(
+            this.level.goalPos.x,
+            this.level.goalPos.y,
+            30,
+            0,
+            Math.PI * 2
+          );
+          this.ctx.fill();
+          this.ctx.strokeStyle = "black";
+          this.ctx.lineWidth = 3 / this.scale;
+          this.ctx.stroke();
+
+          // Draw background polygons on top of everything
+          if (
+            this.level.background &&
+            this.level.background.positions &&
+            this.level.background.positions.length > 2
+          ) {
+            const bg = this.level.background;
+            // Draw polygon
+            this.ctx.fillStyle = "rgba(200, 200, 255, 0.3)";
+            this.ctx.strokeStyle = "rgba(100, 100, 200, 0.8)";
+            this.ctx.lineWidth = 2 / this.scale;
+
+            this.ctx.beginPath();
+            this.ctx.moveTo(bg.positions[0].x, bg.positions[0].y);
+            for (let i = 1; i < bg.positions.length; i++) {
+              this.ctx.lineTo(bg.positions[i].x, bg.positions[i].y);
+            }
+            this.ctx.closePath();
+            this.ctx.fill();
+            this.ctx.stroke();
+
+            // Draw points for editing (if background editing tool is selected)
+            if (this.currentTool === "background") {
+              bg.positions.forEach((pos, pointIndex) => {
+                this.ctx.fillStyle = "rgba(255, 0, 0, 0.8)";
+                this.ctx.beginPath();
+                this.ctx.arc(pos.x, pos.y, 8 / this.scale, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Highlight selected point
+                if (
+                  this.selectedBackgroundPoint === bg &&
+                  this.backgroundPointIndex === pointIndex
+                ) {
+                  this.ctx.strokeStyle = "#007bff";
+                  this.ctx.lineWidth = 3 / this.scale;
+                  this.ctx.beginPath();
+                  this.ctx.arc(pos.x, pos.y, 12 / this.scale, 0, Math.PI * 2);
+                  this.ctx.stroke();
+                }
+              });
+            }
+          }
+
+          // Highlight selected object
+          if (this.selectedObject) {
+            this.ctx.strokeStyle = "#007bff";
+            this.ctx.lineWidth = 3 / this.scale;
+            if (this.selectedObject.type === "box") {
+              this.ctx.strokeRect(
+                this.selectedObject.x - 2,
+                this.selectedObject.y - 2,
+                this.selectedObject.width + 4,
+                this.selectedObject.height + 4
+              );
+            } else {
+              const radius =
+                this.selectedObject.type === "goal"
+                  ? 32
+                  : this.selectedObject.type === "rope"
+                  ? this.selectedObject.radius + 2
+                  : 22;
+              this.ctx.beginPath();
+              this.ctx.arc(
+                this.selectedObject.x,
+                this.selectedObject.y,
+                radius,
+                0,
+                Math.PI * 2
+              );
+              this.ctx.stroke();
+            }
+          }
+
+          // Restore context
+          this.ctx.restore();
+        }
+      }
+
+      const editor = new LevelEditor();
+
+      function deleteSelected() {
+        if (!editor.selectedObject) return;
+
+        if (
+          editor.selectedObject.type === "player" ||
+          editor.selectedObject.type === "goal"
+        ) {
+          alert("Cannot delete player or goal!");
+          return;
+        }
+
+        if (editor.selectedObject.ref) {
+          const index = editor.level.objects.indexOf(editor.selectedObject.ref);
+          if (index > -1) {
+            editor.level.objects.splice(index, 1);
+          }
+        }
+
+        editor.selectedObject = null;
+        editor.updatePropertyPanel();
+        editor.render();
+      }
+
+      function clearLevel() {
+        if (confirm("Are you sure you want to clear the level?")) {
+          editor.level.objects = [];
+          editor.selectedObject = null;
+          editor.updatePropertyPanel();
+          editor.render();
+        }
+      }
+
+      function exportLevel() {
+        const level = editor.level;
+        const code = `import { Vector } from "kontra";
+
+export default function getLevel() {
+  return {
+    playerPos: Vector(${level.playerPos.x}, ${level.playerPos.y}),
+    goalPos: Vector(${level.goalPos.x}, ${level.goalPos.y}),
+    background: { 
+      positions: [${level.background.positions
+        .map((pos) => `\n        Vector(${pos.x}, ${pos.y})`)
+        .join(",")}
+      ]
+    },
+    objects: [${level.objects
+      .slice() // Create a copy to avoid modifying original
+      .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0)) // Sort by z-index
+      .map((obj) => {
+        if (obj.box) {
+          return `\n      { box: { pos: Vector(${obj.box.pos.x}, ${obj.box.pos.y}), width: ${obj.box.width}, height: ${obj.box.height} } }`;
+        }
+        if (obj.pickup) {
+          return `\n      { pickup: { pos: Vector(${obj.pickup.pos.x}, ${obj.pickup.pos.y}) } }`;
+        }
+        if (obj.shuriken) {
+          return `\n      { shuriken: { pos: Vector(${obj.shuriken.pos.x}, ${obj.shuriken.pos.y}) } }`;
+        }
+        if (obj.ropeContactPoint) {
+          return `\n      { ropeContactPoint: { pos: Vector(${obj.ropeContactPoint.pos.x}, ${obj.ropeContactPoint.pos.y}), radius: ${obj.ropeContactPoint.radius} } }`;
+        }
+        return "";
+      })
+      .join(",")}
+    ],
+  };
+}`;
+
+        document.getElementById("output").value = code;
+      }
+
+      function importLevel() {
+        const code = document.getElementById("output").value.trim();
+        if (!code) {
+          alert("Please paste level code in the textarea first!");
+          return;
+        }
+
+        try {
+          // Parse the level code to extract the level data
+          const levelData = parseLevelCode(code);
+
+          // Update the editor with the imported data
+          editor.level = levelData;
+
+          // Add default z-index to objects that don't have it
+          if (editor.level.objects) {
+            editor.level.objects.forEach((obj) => {
+              if (obj.box && obj.zIndex === undefined) {
+                obj.zIndex = 0;
+              }
+            });
+          }
+
+          editor.selectedObject = null;
+          editor.updatePropertyPanel();
+          editor.render();
+
+          alert("Level imported successfully!");
+        } catch (error) {
+          alert("Error importing level: " + error.message);
+        }
+      }
+
+      function parseLevelCode(code) {
+        let objectContent;
+
+        // Check if it's a complete function with return statement
+        const returnMatch = code.match(/return\s*\{([\s\S]*)\}\s*;?\s*$/m);
+        if (returnMatch) {
+          // Extract content from return statement
+          objectContent = returnMatch[1].trim();
+        } else {
+          // Assume it's just the object content directly
+          objectContent = code.trim();
+          // Remove outer braces if present
+          if (objectContent.startsWith("{") && objectContent.endsWith("}")) {
+            objectContent = objectContent.slice(1, -1).trim();
+          }
+          // Remove trailing semicolon if present
+          objectContent = objectContent.replace(/;\s*$/, "");
+        }
+
+        // Remove any trailing comma
+        objectContent = objectContent.replace(/,\s*$/, "");
+
+        // Parse using a simple approach - convert Vector() calls to a parseable format
+        const jsonString = `{${objectContent}}`
+          .replace(/Vector\s*\(\s*([^)]+)\s*\)/g, (match, args) => {
+            const [x, y] = args.split(",").map((s) => s.trim());
+            return `{"x": ${x}, "y": ${y}}`;
+          })
+          .replace(/(\w+):/g, '"$1":') // Quote property names
+          .replace(/\/\/[^\n\r]*/g, "") // Remove comments
+          .replace(/,\s*}/g, "}") // Remove trailing commas
+          .replace(/,\s*]/g, "]"); // Remove trailing commas in arrays
+
+        try {
+          const levelObj = JSON.parse(jsonString);
+          return levelObj;
+        } catch (e) {
+          throw new Error("Could not parse level object: " + e.message);
+        }
+      }
+    </script>
+  </body>
+</html>
