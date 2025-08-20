@@ -1016,11 +1016,14 @@ export default function getLevel() {
           // Update the editor with the imported data
           editor.level = levelData;
 
-          // Add default z-index to objects that don't have it
+          // Add z-index to objects based on their order in the array
           if (editor.level.objects) {
+            let boxIndex = 0;
             editor.level.objects.forEach((obj) => {
-              if (obj.box && obj.zIndex === undefined) {
-                obj.zIndex = 0;
+              if (obj.box) {
+                // Assign z-index based on the order in the array
+                obj.zIndex = boxIndex;
+                boxIndex++;
               }
             });
           }
