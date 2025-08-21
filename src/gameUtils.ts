@@ -160,7 +160,7 @@ export function handlePlayerCollisions(
       if (o.type === GameObjectType.Platform) {
         resolveCircleRectangleCollision(player, o as Box);
       } else if (o.type === GameObjectType.Ball) {
-        resolveCircleRectangleCollision(player, o as Ball);
+        resolveCircleRectangleCollision(player, o as Box);
       } else if (o.type === GameObjectType.Pickup) {
         (o as Pickup).collect();
       } else if (o.type === GameObjectType.Shuriken) {

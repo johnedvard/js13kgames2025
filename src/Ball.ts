@@ -1,7 +1,7 @@
 import { Vector } from "kontra";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
-import { colorAccent, colorBlack, colorWhite } from "./colorUtils";
+import { colorBlack } from "./colorUtils";
 
 export class Ball implements MyGameEntity {
   type = GameObjectType.Ball;
