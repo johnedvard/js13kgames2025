@@ -5,6 +5,7 @@ import { Box } from "./Box";
 import { emit, Vector } from "kontra";
 import { Pickup } from "./Pickup";
 import { GameEvent } from "./GameEvent";
+import { Ball } from "./Ball";
 
 // Circle to rectangle collision detection helper
 function isCircleRectangleColliding(
@@ -34,7 +35,10 @@ function isCircleRectangleColliding(
 }
 
 // Calculate overlap and collision response for circle-to-rectangle
-function resolveCircleRectangleCollision(player: Player, platform: Box): void {
+function resolveCircleRectangleCollision(
+  player: Player | Ball,
+  platform: Box
+): void {
   const circleRadius = player.radius; // Use the player's radius property
   const circleCenter = {
     x: player.pos.x - player.radius,
@@ -111,7 +115,36 @@ function resolveCircleRectangleCollision(player: Player, platform: Box): void {
   }
 }
 
-export function handleCollision(player: Player, objects: MyGameEntity[]): void {
+export function handleOtherCollisions(objects: MyGameEntity[]): void {
+  // Check collisions between objects (circles) and platforms (rectangles)
+  for (const o of objects) {
+    if (o.type === GameObjectType.Ball) {
+      objects.forEach((object) => {
+        const ball = o as Ball;
+        if (ball === object) return;
+        if (
+          isCircleRectangleColliding(
+            ball.pos.add(Vector(-ball.radius, ball.radius)), // Circle center
+            ball.radius, // Use ball's radius property
+            object.pos || Vector(0, 0), // Rectangle top-left corner
+            object.width!,
+            object.height!
+          )
+        ) {
+          if (object.type === GameObjectType.Platform) {
+            console.log("Ball collided with platform");
+            resolveCircleRectangleCollision(ball, object as Box);
+          }
+        }
+      });
+    }
+  }
+}
+
+export function handlePlayerCollisions(
+  player: Player,
+  objects: MyGameEntity[]
+): void {
   // Check collisions between player (circle) and platforms (rectangles)
   for (const o of objects) {
     if (o === player) continue;
@@ -126,6 +159,8 @@ export function handleCollision(player: Player, objects: MyGameEntity[]): void {
     ) {
       if (o.type === GameObjectType.Platform) {
         resolveCircleRectangleCollision(player, o as Box);
+      } else if (o.type === GameObjectType.Ball) {
+        resolveCircleRectangleCollision(player, o as Ball);
       } else if (o.type === GameObjectType.Pickup) {
         (o as Pickup).collect();
       } else if (o.type === GameObjectType.Shuriken) {

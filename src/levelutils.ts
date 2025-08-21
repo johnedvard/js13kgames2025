@@ -19,7 +19,7 @@ import level7 from "./level7";
 
 // Keep an odd number of levels to make it work.
 const levels: Array<() => LevelObject> = [
-  level1,
+  level3,
   level2,
   level3,
   level4,
@@ -44,7 +44,7 @@ export function initLevel(
   if (levelData) {
     level = levelData;
   }
-  const player = new Player(canvas, Vector(level.playerPos));
+  const player = new Player(Vector(level.playerPos));
   const goal = new Goal(Vector(level.goalPos));
   camera.setPosition(player.pos);
 

@@ -1,7 +1,7 @@
 import { Vector } from "kontra";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
-import { colorBlack, colorWall } from "./colorUtils";
+import { colorBlack, colorWall, colorWhite } from "./colorUtils";
 
 export class RopeContactPoint implements MyGameEntity {
   pos: Vector;
@@ -24,7 +24,7 @@ export class RopeContactPoint implements MyGameEntity {
 
     // Render white highlight circle behind everything if this is the closest rope point
     if (this.isHighlighted) {
-      context.fillStyle = "#ffffff";
+      context.fillStyle = colorWhite;
       context.globalAlpha = 0.8;
       context.beginPath();
       context.arc(this.pos.x, this.pos.y, this.radius + 10, 0, Math.PI * 2);

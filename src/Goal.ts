@@ -1,7 +1,7 @@
 import { Vector } from "kontra";
 import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
-import { colorBlack } from "./colorUtils";
+import { colorBlack, colorWhite } from "./colorUtils";
 
 export class Goal implements MyGameEntity {
   pos: Vector;
@@ -33,7 +33,7 @@ export class Goal implements MyGameEntity {
     );
 
     // Fill with white
-    context.fillStyle = "#fff";
+    context.fillStyle = colorWhite;
     context.fill();
 
     // Stroke with black

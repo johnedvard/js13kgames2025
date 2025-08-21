@@ -11,8 +11,10 @@ import { initLevel, numLevels } from "./levelutils";
 import { GameEvent } from "./GameEvent";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
-import { handleCollision } from "./gameUtils";
+import { handleOtherCollisions, handlePlayerCollisions } from "./gameUtils";
 import { RopeContactPoint } from "./RopeContactPoint";
+import { Ball } from "./Ball";
+import { colorAccent, colorBlack, colorWhite } from "./colorUtils";
 
 const { canvas } = init("g");
 const { canvas: transitionCanvas } = init("t");
@@ -55,7 +57,7 @@ on(GameEvent.play, ({ levelId, levelData }: any) => {
 
 on(GameEvent.kill, () => {
   if (_player && _player.state === "a") {
-    _player.state = "d"; // Set player state to dead
+    _player.setState("d");
     handlePlayerDead();
   }
 });
@@ -93,7 +95,8 @@ const mainLoop = GameLoop({
       levelPersistentObjects.forEach((object) => object.update());
       camera?.follow(_player, { offset: Vector(100, 100), lerp: true });
       // consider not adding levelpersitent objects to the collision detection
-      handleCollision(_player, [..._objects, ...levelPersistentObjects]);
+      handlePlayerCollisions(_player, [..._objects, ...levelPersistentObjects]);
+      handleOtherCollisions([..._objects, ...levelPersistentObjects]);
       highlightClosestRopeContactPoint();
     }
   },
@@ -110,8 +113,8 @@ const mainLoop = GameLoop({
       selectBonusLevelObjects.forEach((object: any) => object.render(context));
     } else {
       renderBackgrounds(context);
-      _objects.forEach((object) => object.render(context));
       levelPersistentObjects.forEach((object) => object.render(context));
+      _objects.forEach((object) => object.render(context));
     }
   },
 });
@@ -227,16 +230,36 @@ async function startLevel(scene: SceneId = "l") {
 }
 
 function handlePlayerDead() {
-  if (_player.state === "d") {
-    isDisplayingPlayerDiedScreen = true;
+  isDisplayingPlayerDiedScreen = true;
 
-    setTimeout(() => {
-      _objects.length = 0;
-      isDisplayingPlayerDiedScreen = false;
-      mainLoop.stop();
-      startLevel("l");
-    }, 150);
+  // Create 10 balls that burst out from the player's position
+  if (_player) {
+    const colors = [colorWhite, colorBlack, colorAccent]; // Available colors for balls
+
+    for (let i = 0; i < 10; i++) {
+      // Pick a random color
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      const ball = new Ball(Vector(_player.pos.x, _player.pos.y), randomColor);
+
+      // Create a burst effect with random directions and speeds
+      const angle = (i / 10) * Math.PI * 2 + (Math.random() - 0.5) * 0.5; // Distribute around circle with some randomness
+      const speed = 8 + Math.random() * 6; // Random speed between 8-14
+
+      ball.velocity = Vector(
+        Math.cos(angle) * speed,
+        Math.sin(angle) * speed - 3 // Subtract 3 to give upward bias
+      );
+
+      levelPersistentObjects.push(ball);
+    }
   }
+
+  setTimeout(() => {
+    _objects.length = 0;
+    isDisplayingPlayerDiedScreen = false;
+    mainLoop.stop();
+    startLevel("l");
+  }, 750);
 }
 
 function handleLevelClear() {

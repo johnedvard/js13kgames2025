@@ -4,7 +4,7 @@ import { findClosestRopeContactPoint } from "./main";
 import { RopeContactPoint } from "./RopeContactPoint";
 import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
-import { colorAccent, colorBlack } from "./colorUtils";
+import { colorAccent, colorBlack, colorWhite } from "./colorUtils";
 import { playRopeExtend } from "./audio";
 export type PlayerState = "d" | "a";
 
@@ -55,8 +55,10 @@ export class Player implements MyGameEntity {
   gravity = 0.3;
   damping = 0.999;
   maxSpeed = 25;
+  startPos = Vector(0, 0);
 
-  constructor(_canvas: HTMLCanvasElement, startPos: Vector) {
+  constructor(startPos: Vector) {
+    this.startPos = startPos;
     this.pos = startPos;
     this.initializeCatBodyCache();
     this.initializeHeadbandThreads();
@@ -189,7 +191,7 @@ export class Player implements MyGameEntity {
         offsetY
       );
       ctx.closePath();
-      ctx.fillStyle = isBlackShadow ? colorBlack : "#fff";
+      ctx.fillStyle = isBlackShadow ? colorBlack : colorWhite;
       ctx.fill();
 
       // Pupil
@@ -301,6 +303,9 @@ export class Player implements MyGameEntity {
     this.ropeShootProgress = 0;
     this.fullRopeDistance = 0;
   };
+  setState(state: PlayerState) {
+    this.state = state;
+  }
   listenForEvents() {
     on(GameEvent.down, this.onStartGrapple);
     on(GameEvent.up, this.onStopGrapple);
@@ -578,18 +583,7 @@ export class Player implements MyGameEntity {
       // Calculate the difference between current and target spin velocity
       const velocityDifference = targetSpinVelocity - this.spinVelocity;
 
-      // Use different lerp rates for acceleration vs direction change
-      let lerpFactor;
-      if (
-        Math.sign(this.spinVelocity) !== Math.sign(targetSpinVelocity) &&
-        Math.abs(this.spinVelocity) > 1
-      ) {
-        // Changing direction - much slower transition to avoid abrupt changes
-        lerpFactor = 0.02;
-      } else {
-        // Same direction or building up spin - slower transition
-        lerpFactor = 0.08;
-      }
+      let lerpFactor = 0.05;
 
       // Smoothly adjust spin velocity towards target
       this.spinVelocity += velocityDifference * lerpFactor;

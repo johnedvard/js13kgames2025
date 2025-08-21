@@ -6,4 +6,5 @@ export enum GameObjectType {
   Goal = "g",
   Pickup = "up",
   Shuriken = "s",
+  Ball = "b",
 }
