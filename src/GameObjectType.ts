@@ -7,4 +7,6 @@ export enum GameObjectType {
   Pickup = "up",
   Shuriken = "s",
   Ball = "b",
+  MainMenu = "m",
+  Text = "t",
 }

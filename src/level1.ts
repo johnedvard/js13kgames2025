@@ -4,7 +4,7 @@ import { LevelObject } from "./types";
 export default function getLevel(): LevelObject {
   return {
     playerPos: Vector(0, -500),
-    goalPos: Vector(2415, 120),
+    goalPos: Vector(2265, 120),
     background: {
       positions: [
         Vector(-490, -940),
@@ -27,7 +27,7 @@ export default function getLevel(): LevelObject {
       // right wall
       { box: { pos: Vector(1500 + 1100, -750), width: 200, height: 1100 } },
       { text: { pos: Vector(190, -400), text: "Tap and hold" } },
-      { text: { pos: Vector(2415 - 40, 200), text: "Goal" } },
+      { text: { pos: Vector(2315, 200), text: "Goal" } },
       { ropeContactPoint: { pos: Vector(300, -500), radius: 40 } },
       { ropeContactPoint: { pos: Vector(1000, -500), radius: 40 } },
       { ropeContactPoint: { pos: Vector(1800, -500), radius: 40 } },

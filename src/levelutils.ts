@@ -1,4 +1,4 @@
-import { Vector, Text } from "kontra";
+import { Vector } from "kontra";
 
 import { Camera } from "./Camera";
 import { Goal } from "./Goal";
@@ -8,7 +8,7 @@ import { Box } from "./Box";
 import { RopeContactPoint } from "./RopeContactPoint";
 import { Pickup } from "./Pickup";
 import { Shuriken } from "./Shuriken";
-import { colorBlack } from "./colorUtils";
+
 import level1 from "./level1";
 import level2 from "./level2";
 import level3 from "./level3";
@@ -16,9 +16,11 @@ import level4 from "./level4";
 import level5 from "./level5";
 import level6 from "./level6";
 import level7 from "./level7";
+import { colorBlack } from "./colorUtils";
+import { MyText } from "./MyText";
 
 // Keep an odd number of levels to make it work.
-const levels: Array<() => LevelObject> = [
+export const levels: Array<() => LevelObject> = [
   level1,
   level2,
   level3,
@@ -32,18 +34,11 @@ export function numLevels() {
   return levels.length;
 }
 
-export function initLevel(
-  canvas: HTMLCanvasElement,
-  camera: Camera,
-  levelId = 1,
-  levelData: any
-) {
+export function initLevel(camera: Camera, levelId = 1) {
   const gameObjects: any[] = [];
 
   let level = levels[levelId - 1]();
-  if (levelData) {
-    level = levelData;
-  }
+
   const player = new Player(Vector(level.playerPos));
   const goal = new Goal(Vector(level.goalPos));
   camera.setPosition(player.pos);
@@ -65,14 +60,11 @@ export function initLevel(
     } else if (object.shuriken) {
       gameObjects.push(new Shuriken(object.shuriken.pos));
     } else if (object.text) {
-      const text = Text({
-        color: colorBlack,
-        x: object.text.pos.x,
-        y: object.text.pos.y,
-        text: object.text.text,
-        font: "42px Impact",
-        context: canvas.getContext("2d") as CanvasRenderingContext2D,
-      });
+      const text = new MyText(
+        Vector(object.text.pos),
+        object.text.text,
+        colorBlack
+      );
       gameObjects.push(text);
     }
   });

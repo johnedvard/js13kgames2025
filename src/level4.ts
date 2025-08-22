@@ -5,7 +5,7 @@ import { LevelObject } from "./types";
 export default function getLevel(): LevelObject {
   return {
     playerPos: Vector(-800, 0), // Bottom left corner
-    goalPos: Vector(1300, -650), // Top left corner
+    goalPos: Vector(1150, -650), // Top left corner
     background: {
       positions: [
         Vector(-1180, -1980),
@@ -36,7 +36,7 @@ export default function getLevel(): LevelObject {
       { pickup: { pos: Vector(-500, -1500) } },
       { pickup: { pos: Vector(500, -900) } },
       // Instructions
-      { text: { pos: Vector(-800, -160), text: "Swing up the tower!" } },
+      { text: { pos: Vector(-700, -160), text: "Swing up!" } },
     ],
   };
 }

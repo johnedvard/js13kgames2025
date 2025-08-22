@@ -3,7 +3,7 @@ import { Vector } from "kontra";
 export default function getLevel() {
   return {
     playerPos: Vector(760, 1988),
-    goalPos: Vector(4216, 2744),
+    goalPos: Vector(4066, 2744),
     background: {
       positions: [
         Vector(88, 164),

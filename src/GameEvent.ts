@@ -4,6 +4,7 @@ export enum GameEvent {
   play = "p",
   selectLevel = "l",
   drag = "dr",
+  wheel = "w",
   kill = "k",
   goal = "g",
 }

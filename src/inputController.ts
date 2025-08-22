@@ -16,6 +16,7 @@ export function initializeInputController(canvas: HTMLCanvasElement) {
   _canvas.addEventListener("mousedown", onMouseDown);
   _canvas.addEventListener("mouseup", onMouseUp);
   _canvas.addEventListener("mousemove", onMouseMove);
+  _canvas.addEventListener("wheel", onWheel, { passive: false });
 
   // Touch events
   _canvas.addEventListener("touchstart", onTouchStart, { passive: false });
@@ -32,6 +33,7 @@ export function cleanupInputController() {
   _canvas.removeEventListener("mousedown", onMouseDown);
   _canvas.removeEventListener("mouseup", onMouseUp);
   _canvas.removeEventListener("mousemove", onMouseMove);
+  _canvas.removeEventListener("wheel", onWheel);
 
   // Touch events
   _canvas.removeEventListener("touchstart", onTouchStart);
@@ -46,31 +48,44 @@ export function cleanupInputController() {
 function onMouseDown(e: MouseEvent) {
   isTouching = true;
   isDragging = false;
-  startX = e.clientX * window.devicePixelRatio;
-  startY = e.clientY * window.devicePixelRatio;
+
+  // Convert screen coordinates to canvas coordinates
+  const rect = _canvas.getBoundingClientRect();
+  const scaleX = _canvas.width / rect.width;
+  const scaleY = _canvas.height / rect.height;
+
+  startX = (e.clientX - rect.left) * scaleX;
+  startY = (e.clientY - rect.top) * scaleY;
+
   emit(GameEvent.down, Vector(startX, startY));
 }
 
 function onMouseUp(e: MouseEvent) {
-  // multiply with window.devicePixelRatio to get the actual canvas size (because we scale the canvas like this)
-  emit(
-    GameEvent.up,
-    Vector(
-      e.clientX * window.devicePixelRatio,
-      e.clientY * window.devicePixelRatio
-    )
-  );
+  // Convert screen coordinates to canvas coordinates
+  const rect = _canvas.getBoundingClientRect();
+  const scaleX = _canvas.width / rect.width;
+  const scaleY = _canvas.height / rect.height;
+
+  const canvasX = (e.clientX - rect.left) * scaleX;
+  const canvasY = (e.clientY - rect.top) * scaleY;
+
+  emit(GameEvent.up, Vector(canvasX, canvasY));
 
   isTouching = false;
   isDragging = false;
   playSong();
-  emit(GameEvent.up, Vector(startX, startY));
 }
 
 function onMouseMove(e: MouseEvent) {
   if (isTouching) {
-    currentX = e.clientX * window.devicePixelRatio;
-    currentY = e.clientY * window.devicePixelRatio;
+    // Convert screen coordinates to canvas coordinates
+    const rect = _canvas.getBoundingClientRect();
+    const scaleX = _canvas.width / rect.width;
+    const scaleY = _canvas.height / rect.height;
+
+    currentX = (e.clientX - rect.left) * scaleX;
+    currentY = (e.clientY - rect.top) * scaleY;
+
     if (!isDragging) {
       isDragging = true;
     }
@@ -82,8 +97,15 @@ function onTouchStart(e: TouchEvent) {
   isTouching = true;
   isDragging = false;
   const touch = e.touches[0];
-  startX = touch.clientX * window.devicePixelRatio;
-  startY = touch.clientY * window.devicePixelRatio;
+
+  // Convert screen coordinates to canvas coordinates
+  const rect = _canvas.getBoundingClientRect();
+  const scaleX = _canvas.width / rect.width;
+  const scaleY = _canvas.height / rect.height;
+
+  startX = (touch.clientX - rect.left) * scaleX;
+  startY = (touch.clientY - rect.top) * scaleY;
+
   emit(GameEvent.down, Vector(startX, startY));
   e.preventDefault();
   playSong();
@@ -92,13 +114,16 @@ function onTouchStart(e: TouchEvent) {
 
 function onTouchEnd(e: TouchEvent) {
   const touch = e.changedTouches[0];
-  emit(
-    GameEvent.up,
-    Vector(
-      touch.clientX * window.devicePixelRatio,
-      touch.clientY * window.devicePixelRatio
-    )
-  );
+
+  // Convert screen coordinates to canvas coordinates
+  const rect = _canvas.getBoundingClientRect();
+  const scaleX = _canvas.width / rect.width;
+  const scaleY = _canvas.height / rect.height;
+
+  const canvasX = (touch.clientX - rect.left) * scaleX;
+  const canvasY = (touch.clientY - rect.top) * scaleY;
+
+  emit(GameEvent.up, Vector(canvasX, canvasY));
   isTouching = false;
   isDragging = false;
 }
@@ -106,13 +131,38 @@ function onTouchEnd(e: TouchEvent) {
 function onTouchMove(e: TouchEvent) {
   if (isTouching) {
     const touch = e.touches[0];
-    currentX = touch.clientX * window.devicePixelRatio;
-    currentY = touch.clientY * window.devicePixelRatio;
+
+    // Convert screen coordinates to canvas coordinates
+    const rect = _canvas.getBoundingClientRect();
+    const scaleX = _canvas.width / rect.width;
+    const scaleY = _canvas.height / rect.height;
+
+    currentX = (touch.clientX - rect.left) * scaleX;
+    currentY = (touch.clientY - rect.top) * scaleY;
+
     if (!isDragging) {
       isDragging = true;
     }
     emitDragEvent();
   }
+}
+
+function onWheel(e: WheelEvent) {
+  e.preventDefault(); // Prevent page scrolling
+
+  // Convert screen coordinates to canvas coordinates
+  const rect = _canvas.getBoundingClientRect();
+  const scaleX = _canvas.width / rect.width;
+  const scaleY = _canvas.height / rect.height;
+
+  const canvasX = (e.clientX - rect.left) * scaleX;
+  const canvasY = (e.clientY - rect.top) * scaleY;
+
+  emit(GameEvent.wheel, {
+    deltaY: e.deltaY,
+    x: canvasX,
+    y: canvasY,
+  });
 }
 
 function onKeyDown(e: KeyboardEvent) {

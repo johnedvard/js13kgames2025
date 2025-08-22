@@ -232,6 +232,7 @@ export class Player implements MyGameEntity {
 
   onStartGrapple = () => {
     playRopeExtend();
+
     const closestRopeContactPoint = findClosestRopeContactPoint(this.pos);
     this.ropeContactPoint = closestRopeContactPoint;
     if (!closestRopeContactPoint) return;
