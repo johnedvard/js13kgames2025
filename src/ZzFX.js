@@ -4,11 +4,11 @@ const zzfxV = 0.3;
 // zzfxR - global sample rate
 export const zzfxR = 44100;
 
-// zzfxX - the common audio context
+// zzfxX - the common audio context (unified single context)
 export const zzfxX = new (window.AudioContext || webkitAudioContext)();
-const sfxContext = new (window.AudioContext || webkitAudioContext)();
+
 // zzfx() - the universal entry point -- returns a AudioBufferSourceNode
-export const zzfx = (...t) => zzfxP(sfxContext, zzfxG(...t));
+export const zzfx = (...t) => zzfxP(zzfxX, zzfxG(...t));
 
 // zzfxP() - the sound player -- returns a AudioBufferSourceNode
 export const zzfxP = (ctx, ...t) => {

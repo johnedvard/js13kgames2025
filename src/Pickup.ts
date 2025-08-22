@@ -3,7 +3,7 @@ import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
 import { colorAccent, colorBlack } from "./colorUtils";
 
-import { playPickupSound } from "./myAudio";
+import { playPickup } from "./audio";
 
 export class Pickup implements MyGameEntity {
   type = GameObjectType.Pickup;
@@ -265,7 +265,7 @@ export class Pickup implements MyGameEntity {
   collect() {
     if (this.state === "c" || this.state === "d") return; // Prevent double collection
     this.collected = true;
-    playPickupSound();
+    playPickup();
     this.state = "c";
     this.burstStartTime = this.animationTime; // Start the burst animation
   }

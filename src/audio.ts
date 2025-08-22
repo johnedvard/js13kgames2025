@@ -61,34 +61,6 @@ export function playPickup() {
   ); // Pickup 48
 }
 
-export function playExplode() {
-  zzfx(
-    ...[
-      1.9,
-      ,
-      346,
-      0.01,
-      0.04,
-      0.11,
-      4,
-      4.4,
-      85,
-      ,
-      ,
-      ,
-      ,
-      ,
-      367,
-      ,
-      0.32,
-      0.64,
-      0.16,
-      ,
-      -1094,
-    ]
-  ); // Random 252
-}
-
 export function playGoal() {
   zzfx(
     ...[

@@ -5,8 +5,7 @@ import { RopeContactPoint } from "./RopeContactPoint";
 import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
 import { colorAccent, colorBlack, colorWhite } from "./colorUtils";
-
-import { playRopeExtendSound } from "./myAudio";
+import { playRopeExtend } from "./audio";
 export type PlayerState = "d" | "a";
 
 // Verlet point for headband threads
@@ -232,7 +231,7 @@ export class Player implements MyGameEntity {
   }
 
   onStartGrapple = () => {
-    playRopeExtendSound();
+    playRopeExtend();
 
     const closestRopeContactPoint = findClosestRopeContactPoint(this.pos);
     this.ropeContactPoint = closestRopeContactPoint;

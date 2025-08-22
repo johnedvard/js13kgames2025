@@ -15,7 +15,7 @@ import { RopeContactPoint } from "./RopeContactPoint";
 import { Ball } from "./Ball";
 import { colorAccent, colorBlack, colorGray, colorWhite } from "./colorUtils";
 import { MainMenu } from "./MainMenu";
-import { playGoalSound, playKillSound } from "./myAudio";
+import { playDead, playGoal } from "./audio";
 
 const { canvas } = init("g");
 const { canvas: transitionCanvas } = init("t");
@@ -257,7 +257,7 @@ function handlePlayerDead() {
   // Create 10 balls that burst out from the player's position
   if (_player) {
     const colors = [colorWhite, colorBlack, colorAccent]; // Available colors for balls
-    playKillSound();
+    playDead();
     for (let i = 0; i < 10; i++) {
       // Pick a random color
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
@@ -287,7 +287,7 @@ function handlePlayerDead() {
 function handleLevelClear() {
   if (isDisplayingLevelClearScreen || isDisplayingPlayerDiedScreen) return;
   if (!isDisplayingLevelClearScreen) {
-    playGoalSound();
+    playGoal();
 
     isDisplayingLevelClearScreen = true;
     levelPersistentObjects.length = 0;

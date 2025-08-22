@@ -14,7 +14,7 @@ import {
 import { getItem } from "./storageUtils";
 import { Pickup } from "./Pickup";
 import { GameEvent } from "./GameEvent";
-import { playDisableBtnClickSound, playGoalSound } from "./myAudio";
+import { playButtonDisable, playGoal } from "./audio";
 
 type MainMenuState = "h" | "v"; //hidden visible
 
@@ -161,14 +161,12 @@ export class MainMenu implements MyGameEntity {
       // Draw level text in red with larger font
       ctx.fillStyle = colorAccent;
       ctx.font = `${Math.min(this.buttonHeight * 0.6, 48)}px ${fontFamily}`;
-      ctx.textAlign = "left";
-      ctx.textBaseline = "middle";
 
       const levelText = levelId.toString().padStart(3, "0");
       ctx.fillText(
         levelText,
         rectX + 20 + pressOffset,
-        rectY + this.buttonHeight / 2 + pressOffset
+        rectY + this.buttonHeight / 2 + 20 + pressOffset
       );
 
       // Always create pickups for each level (3 total)
@@ -412,13 +410,13 @@ export class MainMenu implements MyGameEntity {
       if (this.isLevelPlayable(clickedLevel)) {
         console.log(`Level ${clickedLevel} clicked!`);
         // Emit play event with the selected level ID
-        playGoalSound();
+        playGoal();
         emit(GameEvent.play, { levelId: clickedLevel });
         return true;
       } else {
         console.log(`Level ${clickedLevel} is not yet unlocked!`);
         // Play disabled button sound
-        playDisableBtnClickSound();
+        playButtonDisable();
         // Start shake animation for the disabled button
         this.startShakeAnimation(clickedLevel);
         return false;
@@ -758,8 +756,7 @@ export class MainMenu implements MyGameEntity {
       // Draw level text
       ctx.fillStyle = colorAccent;
       ctx.font = `${Math.min(this.buttonHeight * 0.6, 48)}px ${fontFamily}`;
-      ctx.textAlign = "left";
-      ctx.textBaseline = "middle";
+
       const levelText = levelId.toString().padStart(3, "0");
       ctx.fillText(levelText, rectX + 20, rectY + this.buttonHeight / 2);
 
@@ -770,23 +767,21 @@ export class MainMenu implements MyGameEntity {
   private drawTitle(ctx: CanvasRenderingContext2D) {
     if (!this.canvas) return;
 
-    const centerX = this.canvas.width / 2;
-    const titleY = 120; // Position from top of screen
+    const centerX = this.canvas.width / 2 - 500;
+    const titleY = 220; // Position from top of screen
     const shadowOffset = 16;
     const font = `148px ${fontFamily}`;
     const title = "Triska the Ninja Cat";
     // Draw title shadow first
     ctx.fillStyle = colorBlack;
     ctx.font = font;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+
     ctx.fillText(title, centerX + shadowOffset, titleY + shadowOffset);
 
     // Draw main title
     ctx.fillStyle = colorWhite;
     ctx.font = font;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+
     ctx.fillText(title, centerX, titleY);
   }
 
