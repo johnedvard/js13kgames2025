@@ -2,7 +2,8 @@ import { Vector } from "kontra";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
 import { colorAccent, colorBlack } from "./colorUtils";
-import { playPickup } from "./audio";
+
+import { playPickupSound } from "./myAudio";
 
 export class Pickup implements MyGameEntity {
   type = GameObjectType.Pickup;
@@ -27,9 +28,15 @@ export class Pickup implements MyGameEntity {
   private cloverShadowContext: OffscreenCanvasRenderingContext2D | null = null;
 
   private state: "c" | "d" | "a" = "a";
-  constructor(startPos: Vector) {
+  collected = false;
+  constructor(startPos: Vector, private color = colorAccent) {
     this.pos = startPos;
     this.initializeCloverCache();
+  }
+
+  setScale(value: number) {
+    this.baseScale = value;
+    this.update();
   }
 
   private initializeCloverCache() {
@@ -60,7 +67,7 @@ export class Pickup implements MyGameEntity {
     }
     const drawStalk = () => {
       ctx.save();
-      ctx.strokeStyle = isBlackShadow ? colorBlack : colorAccent;
+      ctx.strokeStyle = isBlackShadow ? colorBlack : this.color;
       ctx.lineWidth = 10;
 
       ctx.beginPath();
@@ -74,7 +81,7 @@ export class Pickup implements MyGameEntity {
       ctx.save();
       ctx.translate(offsetX, offsetY);
       ctx.rotate(rotation);
-      ctx.fillStyle = isBlackShadow ? colorBlack : colorAccent;
+      ctx.fillStyle = isBlackShadow ? colorBlack : this.color;
       ctx.beginPath();
 
       const centerAdjustX = 3;
@@ -257,7 +264,8 @@ export class Pickup implements MyGameEntity {
 
   collect() {
     if (this.state === "c" || this.state === "d") return; // Prevent double collection
-    playPickup();
+    this.collected = true;
+    playPickupSound();
     this.state = "c";
     this.burstStartTime = this.animationTime; // Start the burst animation
   }

@@ -1,6 +1,6 @@
 import { Vector, emit } from "kontra";
 import { GameEvent } from "./GameEvent";
-import { playSong } from "./audio";
+import { playBackgroundMusic } from "./myAudio";
 
 let isTouching = false;
 let isDragging = false;
@@ -73,7 +73,8 @@ function onMouseUp(e: MouseEvent) {
 
   isTouching = false;
   isDragging = false;
-  playSong();
+  // playSong();
+  // playBackgroundMusic();
 }
 
 function onMouseMove(e: MouseEvent) {
@@ -108,7 +109,8 @@ function onTouchStart(e: TouchEvent) {
 
   emit(GameEvent.down, Vector(startX, startY));
   e.preventDefault();
-  playSong();
+  // playSong();
+  // playBackgroundMusic();
   return false;
 }
 
@@ -176,7 +178,8 @@ function onKeyDown(e: KeyboardEvent) {
       const centerX = _canvas.width / 2;
       const centerY = _canvas.height / 2;
       emit(GameEvent.down, Vector(centerX, centerY));
-      playSong();
+      // playSong();
+      // playBackgroundMusic();
     }
   }
 }

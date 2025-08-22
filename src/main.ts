@@ -4,8 +4,7 @@ import { SceneTransition } from "./SceneTransition";
 import { Player } from "./Player";
 import { listenForResize } from "./domUtils";
 import { initializeInputController } from "./inputController";
-import { playDead, playGoal } from "./audio";
-import { setItem } from "./storageUtils";
+import { setItem, getItem } from "./storageUtils";
 import { Goal } from "./Goal";
 import { initLevel } from "./levelutils";
 import { GameEvent } from "./GameEvent";
@@ -14,12 +13,12 @@ import { MyGameEntity } from "./MyGameEntity";
 import { handleOtherCollisions, handlePlayerCollisions } from "./gameUtils";
 import { RopeContactPoint } from "./RopeContactPoint";
 import { Ball } from "./Ball";
-import { colorAccent, colorBlack, colorWhite } from "./colorUtils";
+import { colorAccent, colorBlack, colorGray, colorWhite } from "./colorUtils";
 import { MainMenu } from "./MainMenu";
+import { playGoalSound, playKillSound } from "./myAudio";
 
 const { canvas } = init("g");
 const { canvas: transitionCanvas } = init("t");
-const { canvas: backgroundCanvas } = init("b");
 // These are just in-game values, not the actual canvas size
 export const GAME_WIDTH = 2548;
 
@@ -30,8 +29,8 @@ enum SceneId {
   Menu = "s",
 }
 
-let activeScene: SceneId = SceneId.Level;
-let nextScene: SceneId = SceneId.Level;
+let activeScene: SceneId = SceneId.Menu;
+let nextScene: SceneId = SceneId.Menu;
 const sceneTransition = new SceneTransition(transitionCanvas);
 let _player: Player;
 let _goal: Goal;
@@ -51,12 +50,10 @@ const selectLevelObjects: any = [];
 let _closestRopeContactPoint: RopeContactPoint | null = null;
 
 on(GameEvent.play, ({ levelId }: any) => {
-  setTimeout(() => {
-    currentLevelId = levelId;
-    nextScene = SceneId.Level;
-    sceneTransition.reset();
-    transitionLoop.start();
-  }, 500);
+  currentLevelId = levelId;
+  nextScene = SceneId.Level;
+  sceneTransition.reset();
+  transitionLoop.start();
 });
 
 on(GameEvent.kill, () => {
@@ -75,12 +72,14 @@ on(GameEvent.up, ({ x, y }: any) => {
   if (activeScene === "s") {
     mainMenu.handleClick(x, y);
     mainMenu.handleDragEnd();
+    mainMenu.handleMouseUp(); // Handle button press state
   }
 });
 
 on(GameEvent.down, ({ x, y }: any) => {
   // Handle main menu drag start when in select scene
   if (activeScene === "s") {
+    mainMenu.handleMouseDown(x, y); // Handle button press state
     if (mainMenu.isPointInMainMenu(x, y)) {
       mainMenu.handleDragStart(y);
     }
@@ -141,9 +140,7 @@ const mainLoop = GameLoop({
 
     if (activeScene === SceneId.Menu) {
       mainMenu.render(context);
-    } else if (activeScene === SceneId.Select) {
       selectLevelObjects.forEach((object: any) => object.render(context));
-      mainMenu.render(context);
     } else {
       renderBackgrounds(context);
       levelPersistentObjects.forEach((object) => object.render(context));
@@ -168,8 +165,8 @@ function renderBackgrounds(context: CanvasRenderingContext2D) {
     const minX = Math.min(...positions.map((p: any) => p.x));
 
     const gradient = context.createLinearGradient(minX, minY, minX, maxY);
-    gradient.addColorStop(0, "#D3D3D3"); // lightgray
-    gradient.addColorStop(1, "#A9A9A9"); // darkgray
+    gradient.addColorStop(0, "#ddd"); // lightgray
+    gradient.addColorStop(1, colorGray); // darkgray
 
     context.fillStyle = gradient;
 
@@ -201,12 +198,14 @@ const transitionLoop = GameLoop({
       fadeinComplete = true;
       if (nextScene === SceneId.Menu) {
         activeScene = SceneId.Menu;
+        // Refresh the main menu buttons to show updated completion data
+        mainMenu.refreshButtons();
         mainMenuObjects.forEach((object: any) => {
           object && object.destroy && object.destroy();
         });
         mainMenuObjects.length = 0;
       } else if (nextScene === SceneId.Level) {
-        startLevel(SceneId.Level);
+        startLevel(SceneId.Level, currentLevelId);
         destroySelectLevelObjects();
       }
     } else if (sceneTransition.isFadeOutComplete()) {
@@ -223,11 +222,11 @@ const transitionLoop = GameLoop({
   },
 });
 
-async function startLevel(scene: SceneId = SceneId.Level, levelId = 1) {
+async function startLevel(scene: SceneId = SceneId.Level, levelId: number) {
   activeScene = scene;
   currentLevelId = levelId;
   if (!gameHasStarted) {
-    listenForResize([backgroundCanvas, transitionCanvas, canvas], []);
+    listenForResize([transitionCanvas, canvas], []);
     initializeInputController(canvas);
     camera = new Camera(canvas);
   }
@@ -258,7 +257,7 @@ function handlePlayerDead() {
   // Create 10 balls that burst out from the player's position
   if (_player) {
     const colors = [colorWhite, colorBlack, colorAccent]; // Available colors for balls
-    playDead();
+    playKillSound();
     for (let i = 0; i < 10; i++) {
       // Pick a random color
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
@@ -281,25 +280,42 @@ function handlePlayerDead() {
     _objects.length = 0;
     isDisplayingPlayerDiedScreen = false;
     mainLoop.stop();
-    startLevel(SceneId.Level); // Restart the level after a short delay
+    startLevel(SceneId.Level, currentLevelId); // Restart the level after a short delay
   }, 750);
 }
 
 function handleLevelClear() {
   if (isDisplayingLevelClearScreen || isDisplayingPlayerDiedScreen) return;
   if (!isDisplayingLevelClearScreen) {
-    playGoal();
+    playGoalSound();
 
     isDisplayingLevelClearScreen = true;
     levelPersistentObjects.length = 0;
     setTimeout(() => {
-      _objects.length = 0;
       isDisplayingLevelClearScreen = false;
 
       // assume we are playing regular level
-      setItem(`complete-${currentLevelId}`, "true");
+      const pickups = _objects.filter(
+        (object: any) => object.type === GameObjectType.Pickup
+      );
+      let numCollected = 0;
+      pickups.forEach((pickup: any) => {
+        if (pickup.collected) {
+          numCollected++;
+        }
+      });
+
+      // Only save if this is a better score than previously achieved
+      const existingScore = getItem<string>(`complete-${currentLevelId}`);
+      const previousBest = existingScore ? parseInt(existingScore, 10) : 0;
+
+      if (numCollected > previousBest) {
+        setItem(`complete-${currentLevelId}`, `${numCollected}`);
+      }
+
       currentLevelId++;
 
+      _objects.length = 0;
       mainLoop.stop();
       sceneTransition.reset();
       transitionLoop.start();
@@ -324,4 +340,13 @@ export function findClosestRopeContactPoint(
   return closestObject;
 }
 
-startLevel(SceneId.Level, 1);
+function startMenu() {
+  activeScene = SceneId.Menu;
+  listenForResize([transitionCanvas, canvas], []);
+  initializeInputController(canvas);
+  camera = new Camera(canvas);
+  mainLoop.start();
+}
+
+startMenu();
+// startLevel(SceneId.Level, 1);

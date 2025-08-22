@@ -15,7 +15,7 @@ export default function getLevel() {
     objects: [
       { box: { pos: Vector(200, 200), width: 200, height: 2600 } },
       { shuriken: { pos: Vector(1236, 2156) } },
-      { shuriken: { pos: Vector(1032, 1084) } },
+      { shuriken: { pos: Vector(1000, 1100) } },
       { shuriken: { pos: Vector(1428, 1600) } },
       { pickup: { pos: Vector(1792, 804) } },
       { pickup: { pos: Vector(608, 1788) } },

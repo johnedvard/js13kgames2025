@@ -4,10 +4,36 @@ import { zzfxM } from "./ZzFXM.js";
 let audioContext = zzfxX;
 let myAudioNode: any = null;
 
-export function playDead() {
+export function playButtonDisable() {
+  // more of an "umph" sound
   zzfx(
     ...[0.2, , 276, , 0.09, 0.06, , 2.4, -8, , 350, 0.08, , , , , , 0.88, 0.02]
   ); // Pickup 73
+}
+export function playDead() {
+  zzfx(
+    ...[
+      0.2,
+      ,
+      480,
+      0.01,
+      0.08,
+      0.16,
+      ,
+      3.1,
+      -8,
+      24,
+      447,
+      0.08,
+      0.06,
+      ,
+      ,
+      ,
+      ,
+      0.52,
+      0.02,
+    ]
+  ); // Pickup 131
 }
 export function playPickup() {
   zzfx(
@@ -64,53 +90,29 @@ export function playExplode() {
 }
 
 export function playGoal() {
-  //   zzfx(
-  //     ...[
-  //       0.3,
-  //       ,
-  //       300,
-  //       0.02,
-  //       0.15,
-  //       0.24,
-  //       1,
-  //       3.3,
-  //       8,
-  //       -94,
-  //       66,
-  //       0.06,
-  //       0.03,
-  //       ,
-  //       ,
-  //       0.1,
-  //       ,
-  //       0.57,
-  //       0.13,
-  //       0.39,
-  //     ]
-  //   ); // Powerup 83
   zzfx(
     ...[
-      0.2,
+      0.07,
       ,
-      480,
-      0.01,
-      0.08,
-      0.16,
+      457,
+      0.05,
+      0.12,
+      0.28,
       ,
-      3.1,
-      -8,
-      24,
-      447,
-      0.08,
-      0.06,
+      0.4,
       ,
+      ,
+      233,
+      0.13,
       ,
       ,
       ,
-      0.52,
-      0.02,
+      ,
+      ,
+      0.55,
+      0.28,
     ]
-  ); // Pickup 131
+  ); // Powerup 167
 }
 
 export function playRopeExtend() {
