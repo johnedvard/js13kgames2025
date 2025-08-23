@@ -1,10 +1,16 @@
 import { lerp, Vector } from "kontra";
+import { colorBlack } from "./colorUtils";
 
+enum TransitionState {
+  FadeIn = "i",
+  FadeOut = "o",
+  Complete = "c",
+}
 export class SceneTransition {
   private targetY = -10;
   private lerpFactor = 0.15;
   pos = Vector(0, 0);
-  private state: "fadein" | "fadeout" | "comeplete" = "fadein";
+  private state: TransitionState = TransitionState.FadeIn;
   constructor(private canvas: HTMLCanvasElement) {
     this.pos.y = canvas.height;
   }
@@ -15,7 +21,7 @@ export class SceneTransition {
 
   update() {
     // lerp will "never" reach target, so reduce by a small margin
-    if (this.pos.y - 2 >= this.targetY) {
+    if (this.pos.y - 10 >= this.targetY) {
       this.pos.y = lerp(this.pos.y, this.targetY, this.lerpFactor);
     } else {
       this.pos.y = lerp(
@@ -28,10 +34,13 @@ export class SceneTransition {
   }
 
   handleState() {
-    if (this.state === "fadein" && this.isFadeInComplete()) {
-      this.state = "fadeout";
-    } else if (this.state === "fadeout" && this.isFadeOutComplete()) {
-      this.state = "comeplete";
+    if (this.state === TransitionState.FadeIn && this.isFadeInComplete()) {
+      this.state = TransitionState.FadeOut;
+    } else if (
+      this.state === TransitionState.FadeOut &&
+      this.isFadeOutComplete()
+    ) {
+      this.state = TransitionState.Complete;
     }
   }
   render(context: CanvasRenderingContext2D) {
@@ -42,7 +51,7 @@ export class SceneTransition {
     context.clearRect(0, 0, width, height);
 
     // Draw the black box
-    context.fillStyle = "black";
+    context.fillStyle = colorBlack;
     context.fillRect(0, this.pos.y, width, height);
     context.restore();
   }
@@ -54,7 +63,7 @@ export class SceneTransition {
     return this.pos.y - 2 <= this.targetY - this.canvas.height;
   }
   reset() {
-    this.state = "fadein";
+    this.state = TransitionState.FadeIn;
     this.pos.y = this.canvas.height;
   }
 }

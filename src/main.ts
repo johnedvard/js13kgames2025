@@ -38,8 +38,7 @@ let _objects: MyGameEntity[] = [];
 let camera: Camera;
 let currentLevelId = 1;
 let gameHasStarted = false;
-let isDisplayingLevelClearScreen = false;
-let isDisplayingPlayerDiedScreen = false;
+let isLoadingNextLevel = false;
 const levelPersistentObjects: any[] = [];
 let fadeinComplete = false; // used to control the fadein out transtiion
 let levelBackground: any = null; // Store the current level's background
@@ -64,6 +63,12 @@ on(GameEvent.kill, () => {
 });
 
 on(GameEvent.goal, () => {
+  if (isLoadingNextLevel) return;
+  isLoadingNextLevel = true;
+
+  nextScene = SceneId.Level;
+  sceneTransition.reset();
+  transitionLoop.start();
   handleLevelClear();
 });
 
@@ -205,11 +210,13 @@ const transitionLoop = GameLoop({
         });
         mainMenuObjects.length = 0;
       } else if (nextScene === SceneId.Level) {
+        activeScene = SceneId.Level;
         startLevel(SceneId.Level, currentLevelId);
         destroySelectLevelObjects();
       }
     } else if (sceneTransition.isFadeOutComplete()) {
       fadeinComplete = false;
+      isLoadingNextLevel = false;
       sceneTransition?.reset();
       transitionLoop.stop();
     }
@@ -237,6 +244,7 @@ async function startLevel(scene: SceneId = SceneId.Level, levelId: number) {
   );
   // const seaWeed = new SeaWeed(Vector(player.centerPoint));
   // particles.push(seaWeed);
+  _objects.length = 0;
   _player?.destroy();
   _player = player;
   _goal = goal;
@@ -248,12 +256,11 @@ async function startLevel(scene: SceneId = SceneId.Level, levelId: number) {
   // todo cleanup existing objects
 
   gameHasStarted = true;
+
   mainLoop.start(); // start the game
 }
 
 function handlePlayerDead() {
-  isDisplayingPlayerDiedScreen = true;
-
   // Create 10 balls that burst out from the player's position
   if (_player) {
     const colors = [colorWhite, colorBlack, colorAccent]; // Available colors for balls
@@ -278,49 +285,41 @@ function handlePlayerDead() {
 
   setTimeout(() => {
     _objects.length = 0;
-    isDisplayingPlayerDiedScreen = false;
     mainLoop.stop();
     startLevel(SceneId.Level, currentLevelId); // Restart the level after a short delay
   }, 750);
 }
 
 function handleLevelClear() {
-  if (isDisplayingLevelClearScreen || isDisplayingPlayerDiedScreen) return;
-  if (!isDisplayingLevelClearScreen) {
-    playGoal();
+  playGoal();
 
-    isDisplayingLevelClearScreen = true;
-    levelPersistentObjects.length = 0;
-    setTimeout(() => {
-      isDisplayingLevelClearScreen = false;
+  levelPersistentObjects.length = 0;
 
-      // assume we are playing regular level
-      const pickups = _objects.filter(
-        (object: any) => object.type === GameObjectType.Pickup
-      );
-      let numCollected = 0;
-      pickups.forEach((pickup: any) => {
-        if (pickup.collected) {
-          numCollected++;
-        }
-      });
+  // assume we are playing regular level
+  const pickups = _objects.filter(
+    (object: any) => object.type === GameObjectType.Pickup
+  );
+  let numCollected = 0;
+  pickups.forEach((pickup: any) => {
+    if (pickup.collected) {
+      numCollected++;
+    }
+  });
 
-      // Only save if this is a better score than previously achieved
-      const existingScore = getItem<string>(`complete-${currentLevelId}`);
-      const previousBest = existingScore ? parseInt(existingScore, 10) : 0;
+  // Only save if this is a better score than previously achieved
+  const existingScore = getItem<string>(`c-${currentLevelId}`);
+  const previousBest = existingScore ? parseInt(existingScore, 10) : 0;
 
-      if (numCollected > previousBest) {
-        setItem(`complete-${currentLevelId}`, `${numCollected}`);
-      }
-
-      currentLevelId++;
-
-      _objects.length = 0;
-      mainLoop.stop();
-      sceneTransition.reset();
-      transitionLoop.start();
-    }, 20);
+  if (numCollected > previousBest) {
+    setItem(`c-${currentLevelId}`, `${numCollected}`);
   }
+
+  currentLevelId++;
+
+  // _objects.length = 0;
+  // mainLoop.stop();
+  sceneTransition.reset();
+  transitionLoop.start();
 }
 export function findClosestRopeContactPoint(
   pos: Vector
@@ -346,7 +345,7 @@ function startMenu() {
   initializeInputController(canvas);
   camera = new Camera(canvas);
   mainLoop.start();
+  gameHasStarted = true;
 }
 
 startMenu();
-// startLevel(SceneId.Level, 1);

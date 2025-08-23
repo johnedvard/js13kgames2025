@@ -88,7 +88,6 @@ export class MainMenu implements MyGameEntity {
         (this.maxVisibleButtons - 1) * this.buttonSpacing;
     }
   }
-
   createOffscreenCanvas() {
     // Calculate total content height
     const totalContentHeight =
@@ -130,7 +129,7 @@ export class MainMenu implements MyGameEntity {
       const rectX = 0;
 
       // Get completion data to determine button color
-      const completionData = getItem<string>(`complete-${levelId}`);
+      const completionData = getItem<string>(`c-${levelId}`);
       const hasBeenPlayed = !!completionData;
       const numCollected = completionData ? parseInt(completionData, 10) : 0;
       const isPlayable = this.isLevelPlayable(levelId);
@@ -380,7 +379,7 @@ export class MainMenu implements MyGameEntity {
     // Find the highest completed level
     let highestCompleted = 0;
     for (let i = 1; i < levelId; i++) {
-      const completionData = getItem<string>(`complete-${i}`);
+      const completionData = getItem<string>(`c-${i}`);
       if (completionData) {
         highestCompleted = i;
       }
@@ -388,6 +387,13 @@ export class MainMenu implements MyGameEntity {
 
     // Allow playing the next level after the highest completed
     return levelId <= highestCompleted + 1;
+  }
+
+  private isVisibleInScrollArea(screenY: number): boolean {
+    return (
+      screenY > this.scrollAreaTop - this.buttonHeight &&
+      screenY < this.scrollAreaTop + this.scrollAreaHeight
+    );
   }
 
   handleClick(x: number, y: number) {
@@ -408,13 +414,11 @@ export class MainMenu implements MyGameEntity {
     if (clickedLevel !== null) {
       // Check if the level is playable before allowing the click
       if (this.isLevelPlayable(clickedLevel)) {
-        console.log(`Level ${clickedLevel} clicked!`);
         // Emit play event with the selected level ID
         playGoal();
         emit(GameEvent.play, { levelId: clickedLevel });
         return true;
       } else {
-        console.log(`Level ${clickedLevel} is not yet unlocked!`);
         // Play disabled button sound
         playButtonDisable();
         // Start shake animation for the disabled button
@@ -621,10 +625,7 @@ export class MainMenu implements MyGameEntity {
         const screenY = buttonY - this.scrollOffset + this.scrollAreaTop;
 
         // Only render if the button is visible
-        if (
-          screenY > this.scrollAreaTop - this.buttonHeight &&
-          screenY < this.scrollAreaTop + this.scrollAreaHeight
-        ) {
+        if (this.isVisibleInScrollArea(screenY)) {
           for (const pickup of pickups) {
             ctx.save();
             // Position relative to the screen coordinates
@@ -715,15 +716,12 @@ export class MainMenu implements MyGameEntity {
     const screenY = buttonY - this.scrollOffset + this.scrollAreaTop;
 
     // Only draw if the button is visible in the scroll area
-    if (
-      screenY > this.scrollAreaTop - this.buttonHeight &&
-      screenY < this.scrollAreaTop + this.scrollAreaHeight
-    ) {
+    if (this.isVisibleInScrollArea(screenY)) {
       const shadowOffset = 12;
       const rotation = this.getShakeRotation();
 
       // Get button data
-      const completionData = getItem<string>(`complete-${levelId}`);
+      const completionData = getItem<string>(`c-${levelId}`);
       const hasBeenPlayed = !!completionData;
       const isPlayable = this.isLevelPlayable(levelId);
 
@@ -767,7 +765,7 @@ export class MainMenu implements MyGameEntity {
   private drawTitle(ctx: CanvasRenderingContext2D) {
     if (!this.canvas) return;
 
-    const centerX = this.canvas.width / 2 - 500;
+    const centerX = this.canvas.width / 2 - 550;
     const titleY = 220; // Position from top of screen
     const shadowOffset = 16;
     const font = `148px ${fontFamily}`;

@@ -132,7 +132,6 @@ export function handleOtherCollisions(objects: MyGameEntity[]): void {
           )
         ) {
           if (object.type === GameObjectType.Platform) {
-            console.log("Ball collided with platform");
             resolveCircleRectangleCollision(ball, object as Box);
           }
         }
