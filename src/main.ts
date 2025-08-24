@@ -329,6 +329,7 @@ export function findClosestRopeContactPoint(
 
   _objects.forEach((object) => {
     if (object.type !== GameObjectType.RopeContactPoint) return;
+    if (!(object as RopeContactPoint).isActive) return;
     const distance = object.pos.distance(pos);
     if (distance < closestDistance) {
       closestDistance = distance;

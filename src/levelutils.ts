@@ -52,7 +52,9 @@ export function initLevel(camera: Camera, levelId = 1) {
       gameObjects.push(
         new RopeContactPoint(
           object.ropeContactPoint.pos,
-          object.ropeContactPoint.radius
+          object.ropeContactPoint.radius,
+          object.ropeContactPoint.isActive,
+          object.ropeContactPoint.canActivate
         )
       );
     } else if (object.pickup) {

@@ -603,6 +603,16 @@ export class Player implements MyGameEntity {
       }
     }
 
+    // Check if the rope contact point is still active while grappling
+    if (
+      this.isGrappling &&
+      this.ropeContactPoint &&
+      !this.ropeContactPoint.getActive()
+    ) {
+      // Rope contact point is inactive, dismiss grappling
+      this.onStopGrapple();
+    }
+
     if (this.isGrappling && this.ropeContactPoint) {
       // Apply rope physics (pendulum motion)
       this.applyRopePhysics();

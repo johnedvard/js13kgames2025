@@ -28,7 +28,14 @@ export default function getLevel() {
       // right wall
       { box: { pos: Vector(1500 + 1100, -750), width: 200, height: 1100 } },
 
-      { ropeContactPoint: { pos: Vector(700, -500), radius: 40 } },
+      {
+        ropeContactPoint: {
+          pos: Vector(700, -500),
+          radius: 40,
+          isActive: false,
+          canActivate: true,
+        },
+      },
       { ropeContactPoint: { pos: Vector(1800, -500), radius: 40 } },
     ],
   };
