@@ -12,8 +12,53 @@ export default defineConfig({
     terserOptions: {
       toplevel: true,
       keep_classnames: false,
+      keep_fnames: false,
       compress: {
         drop_console: true,
+        drop_debugger: true,
+        dead_code: true,
+        global_defs: {
+          DEBUG: false,
+        },
+        passes: 3,
+        pure_funcs: [
+          "console.log",
+          "console.debug",
+          "console.info",
+          "console.warn",
+        ],
+        unsafe: true,
+        unsafe_comps: true,
+        unsafe_math: true,
+        unsafe_methods: true,
+        unsafe_proto: true,
+        unsafe_regexp: true,
+        unsafe_undefined: true,
+        collapse_vars: true,
+        reduce_vars: true,
+        conditionals: true,
+        evaluate: true,
+        booleans: true,
+        loops: true,
+        unused: true,
+        hoist_funs: true,
+        hoist_props: true,
+        hoist_vars: true,
+        if_return: true,
+        join_vars: true,
+        side_effects: false,
+      },
+      mangle: {
+        toplevel: true,
+        eval: true,
+        reserved: [],
+        properties: {
+          regex: /^_/,
+        },
+      },
+      format: {
+        comments: false,
+        ascii_only: true,
       },
     },
     modulePreload: {
@@ -24,6 +69,13 @@ export default defineConfig({
         // Define output pattern for entry files (main JavaScript files)
         entryFileNames: "[name].js", // No hash in the filename
         chunkFileNames: "[name].js", // No hash in the filename
+        manualChunks: undefined, // Prevent code splitting for smaller builds
+      },
+      treeshake: {
+        preset: "recommended",
+        moduleSideEffects: false,
+        propertyReadSideEffects: false,
+        unknownGlobalSideEffects: false,
       },
     },
   },
@@ -38,6 +90,13 @@ export default defineConfig({
       sortClassName: true,
       removeScriptTypeAttributes: true,
       removeRedundantAttributes: true,
+      collapseWhitespace: true,
+      removeEmptyAttributes: true,
+      removeOptionalTags: true,
+      removeStyleLinkTypeAttributes: true,
+      minifyURLs: true,
+      caseSensitive: true,
+      preventAttributesEscaping: true,
     }),
   ],
 });
