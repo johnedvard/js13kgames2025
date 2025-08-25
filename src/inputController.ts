@@ -169,7 +169,7 @@ function onWheel(e: WheelEvent) {
 }
 
 function onKeyDown(e: KeyboardEvent) {
-  if (e.code === "Space") {
+  if (e.key === " ") {
     e.preventDefault(); // Prevent page scrolling
     if (!isTouching) {
       // Prevent multiple events if already touching
@@ -186,7 +186,7 @@ function onKeyDown(e: KeyboardEvent) {
 }
 
 function onKeyUp(e: KeyboardEvent) {
-  if (e.code === "Space") {
+  if (e.key === " ") {
     e.preventDefault(); // Prevent page scrolling
     if (isTouching) {
       // Only emit up if we were touching

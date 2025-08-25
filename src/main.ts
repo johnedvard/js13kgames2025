@@ -1,4 +1,4 @@
-import { init, GameLoop, Vector, on } from "kontra";
+import { init, GameLoop, Vector, on, Scene } from "kontra";
 import { Camera } from "./Camera";
 import { SceneTransition } from "./SceneTransition";
 import { Player } from "./Player";
@@ -74,7 +74,7 @@ on(GameEvent.goal, () => {
 
 on(GameEvent.up, ({ x, y }: any) => {
   // Handle main menu clicks when in select scene
-  if (activeScene === "s") {
+  if (activeScene === SceneId.Menu) {
     mainMenu.handleClick(x, y);
     mainMenu.handleDragEnd();
     mainMenu.handleMouseUp(); // Handle button press state
@@ -83,7 +83,7 @@ on(GameEvent.up, ({ x, y }: any) => {
 
 on(GameEvent.down, ({ x, y }: any) => {
   // Handle main menu drag start when in select scene
-  if (activeScene === "s") {
+  if (activeScene === SceneId.Menu) {
     mainMenu.handleMouseDown(x, y); // Handle button press state
     if (mainMenu.isPointInMainMenu(x, y)) {
       mainMenu.handleDragStart(y);
@@ -93,7 +93,7 @@ on(GameEvent.down, ({ x, y }: any) => {
 
 on(GameEvent.drag, ({ detail }: any) => {
   // Handle main menu drag when in select scene
-  if (activeScene === "s") {
+  if (activeScene === SceneId.Menu) {
     if (mainMenu.isDragging) {
       mainMenu.handleDragMove(detail.diffY + mainMenu.lastMouseY);
     }
@@ -102,7 +102,7 @@ on(GameEvent.drag, ({ detail }: any) => {
 
 on(GameEvent.wheel, ({ deltaY, x, y }: any) => {
   // Handle main menu wheel scroll when in select scene
-  if (activeScene === "s") {
+  if (activeScene === SceneId.Menu) {
     if (mainMenu.isPointInMainMenu(x, y)) {
       mainMenu.handleScroll(deltaY);
     }
