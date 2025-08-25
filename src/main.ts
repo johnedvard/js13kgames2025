@@ -1,4 +1,4 @@
-import { init, GameLoop, Vector, on, Scene } from "kontra";
+import { init, GameLoop, Vector, on } from "kontra";
 import { Camera } from "./Camera";
 import { SceneTransition } from "./SceneTransition";
 import { Player } from "./Player";

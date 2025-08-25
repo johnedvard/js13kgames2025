@@ -36,7 +36,6 @@ export class RopeContactPoint implements MyGameEntity {
     this.rotation += 0.02; // Rotate slowly over time
 
     // Handle automatic activation/deactivation if canActivate is true
-    console.log("Updating RopeContactPoint:", this.pos);
     if (this.canActivate) {
       this.timeSinceActivated += 16.67; // Assuming 60 FPS, so ~16.67ms per frame
 

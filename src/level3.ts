@@ -32,8 +32,6 @@ export default function getLevel() {
         ropeContactPoint: {
           pos: Vector(700, -500),
           radius: 40,
-          isActive: false,
-          canActivate: true,
         },
       },
       { ropeContactPoint: { pos: Vector(1800, -500), radius: 40 } },

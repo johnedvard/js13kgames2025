@@ -7,7 +7,7 @@ export class Goal implements MyGameEntity {
   pos: Vector;
   type = GameObjectType.Goal;
   width: number = 200;
-  height: number = 300;
+  height: number = 150;
   private alpha: number = 1;
   private radiusX = 100;
   private radiusY = 150;
