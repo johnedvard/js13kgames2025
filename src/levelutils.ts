@@ -67,7 +67,10 @@ export function initLevel(camera: Camera, levelId = 1) {
           object.ropeContactPoint.pos,
           object.ropeContactPoint.radius,
           object.ropeContactPoint.isActive,
-          object.ropeContactPoint.canActivate
+          object.ropeContactPoint.canActivate,
+          object.ropeContactPoint.canMove,
+          object.ropeContactPoint.startPoint,
+          object.ropeContactPoint.endPos
         )
       );
     } else if (object.pickup) {

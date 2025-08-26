@@ -1,4 +1,4 @@
-import { Vector } from "kontra";
+import { Vector, lerp } from "kontra";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
 import {
@@ -8,6 +8,7 @@ import {
   colorGray,
   colorAccent,
 } from "./colorUtils";
+import { smoothstep } from "./mathUtils";
 
 export class RopeContactPoint implements MyGameEntity {
   pos: Vector;
@@ -21,11 +22,11 @@ export class RopeContactPoint implements MyGameEntity {
   timeSinceActivated = 0;
   // Movement properties
   canMove: boolean = false;
-  startPoint: Vector | null = null;
-  endPoint: Vector | null = null;
+  startPoint: Vector;
+  endPos: Vector;
   moveTime: number = 2000; // ms to move from start to end
   moveElapsed: number = 0;
-  movingForward: boolean = true;
+  moveDirection: number = 1; // 1: start to end, -1: end to start
 
   constructor(
     pos: Vector,
@@ -33,8 +34,8 @@ export class RopeContactPoint implements MyGameEntity {
     isActive: boolean = true,
     canActivate: boolean = false,
     canMove: boolean = false,
-    startPoint: Vector | null = null,
-    endPoint: Vector | null = null,
+    startPoint: Vector,
+    endPos: Vector,
     moveTime: number = 2000
   ) {
     this.pos = pos;
@@ -43,7 +44,7 @@ export class RopeContactPoint implements MyGameEntity {
     this.canActivate = canActivate;
     this.canMove = canMove;
     this.startPoint = startPoint || pos;
-    this.endPoint = endPoint || pos;
+    this.endPos = endPos || pos;
     this.moveTime = moveTime;
   }
 
@@ -51,24 +52,20 @@ export class RopeContactPoint implements MyGameEntity {
     this.rotation += 0.02; // Rotate slowly over time
 
     // Movement logic
-    if (this.canMove && this.startPoint && this.endPoint) {
+    if (this.canMove) {
       this.moveElapsed += 16.67; // Assuming 60 FPS
       let t = this.moveElapsed / this.moveTime;
-      if (t > 1) {
-        t = 1;
-        // Reverse direction at end
-        this.moveElapsed = 0;
-        this.movingForward = !this.movingForward;
-        // Swap start/end for back-and-forth
-        const temp = this.startPoint;
-        this.startPoint = this.endPoint;
-        this.endPoint = temp;
-      }
-      // Lerp position
+      let easeT = this.moveDirection === 1 ? t : 1 - t;
+      easeT = smoothstep(easeT);
       this.pos = Vector(
-        this.startPoint.x + (this.endPoint.x - this.startPoint.x) * t,
-        this.startPoint.y + (this.endPoint.y - this.startPoint.y) * t
+        lerp(this.startPoint.x, this.endPos.x, easeT),
+        lerp(this.startPoint.y, this.endPos.y, easeT)
       );
+      if (t >= 1) {
+        t = 1;
+        this.moveElapsed = 0;
+        this.moveDirection *= -1;
+      }
     }
 
     // Handle automatic activation/deactivation if canActivate is true
@@ -82,15 +79,15 @@ export class RopeContactPoint implements MyGameEntity {
   }
 
   render(context: CanvasRenderingContext2D) {
-    // Draw dotted line from startPoint to endPoint if moving
-    if (this.canMove && this.startPoint && this.endPoint) {
+    // Draw dotted line from startPoint to endPos if moving
+    if (this.canMove) {
       context.save();
       context.strokeStyle = colorGray;
       context.lineWidth = 3;
       context.setLineDash([8, 8]);
       context.beginPath();
       context.moveTo(this.startPoint.x, this.startPoint.y);
-      context.lineTo(this.endPoint.x, this.endPoint.y);
+      context.lineTo(this.endPos.x, this.endPos.y);
       context.stroke();
       context.setLineDash([]);
       context.restore();
