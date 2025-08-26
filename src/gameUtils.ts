@@ -69,22 +69,38 @@ function resolveCircleRectangleCollision(
       penetrationBottom
     );
 
-    if (minPenetration === penetrationTop) {
-      // Push up - cat lands on top of platform
-      player.pos.y = rectTop - circleRadius;
-      if (player.velocity.y > 0) player.velocity.y = 0;
-    } else if (minPenetration === penetrationBottom) {
-      // Push down - cat hits bottom of platform
-      player.pos.y = rectBottom + circleRadius;
-      if (player.velocity.y < 0) player.velocity.y = 0;
-    } else if (minPenetration === penetrationLeft) {
-      // Push left - cat hits right side of platform
-      player.pos.x = rectLeft - circleRadius;
-      if (player.velocity.x > 0) player.velocity.x = 0;
+    // Always reflect velocity for bouncy boxes if player
+    if (platform.canBounce && player instanceof Player) {
+      // Move player out of collision (pick closest edge)
+      // We'll use the original minPenetration logic for position, but always reflect velocity
+      if (minPenetration === penetrationTop) {
+        player.pos.y = rectTop - circleRadius;
+      } else if (minPenetration === penetrationBottom) {
+        player.pos.y = rectBottom + circleRadius;
+      } else if (minPenetration === penetrationLeft) {
+        player.pos.x = rectLeft - circleRadius;
+      } else {
+        player.pos.x = rectRight + circleRadius;
+      }
+      // Reflect velocity for both axes
+      player.velocity.x = -player.velocity.x;
+      player.velocity.y = -player.velocity.y;
+      platform.triggerBounce();
     } else {
-      // Push right - cat hits left side of platform
-      player.pos.x = rectRight + circleRadius;
-      if (player.velocity.x < 0) player.velocity.x = 0;
+      // Original non-bounce logic
+      if (minPenetration === penetrationTop) {
+        player.pos.y = rectTop - circleRadius;
+        if (player.velocity.y > 0) player.velocity.y = 0;
+      } else if (minPenetration === penetrationBottom) {
+        player.pos.y = rectBottom + circleRadius;
+        if (player.velocity.y < 0) player.velocity.y = 0;
+      } else if (minPenetration === penetrationLeft) {
+        player.pos.x = rectLeft - circleRadius;
+        if (player.velocity.x > 0) player.velocity.x = 0;
+      } else {
+        player.pos.x = rectRight + circleRadius;
+        if (player.velocity.x < 0) player.velocity.x = 0;
+      }
     }
   } else {
     // Circle center is outside rectangle - handle edge/corner collisions
@@ -104,12 +120,20 @@ function resolveCircleRectangleCollision(
       player.pos.x += normalX * overlap;
       player.pos.y += normalY * overlap;
 
-      // Stop velocity in the direction of collision
+      // Handle velocity in the direction of collision
       const velocityDotNormal =
         player.velocity.x * normalX + player.velocity.y * normalY;
       if (velocityDotNormal < 0) {
-        player.velocity.x -= velocityDotNormal * normalX;
-        player.velocity.y -= velocityDotNormal * normalY;
+        if (platform.canBounce && player instanceof Player) {
+          // Reflect velocity for bouncing (only for Player)
+          player.velocity.x -= 2 * velocityDotNormal * normalX;
+          player.velocity.y -= 2 * velocityDotNormal * normalY;
+          platform.triggerBounce(); // Trigger visual bounce effect
+        } else {
+          // Stop velocity for normal collision
+          player.velocity.x -= velocityDotNormal * normalX;
+          player.velocity.y -= velocityDotNormal * normalY;
+        }
       }
     }
   }

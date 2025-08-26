@@ -11,6 +11,7 @@ import { Shuriken } from "./Shuriken";
 import { colorBlack } from "./colorUtils";
 import { MyText } from "./MyText";
 
+import levelFinal from "./levelFinal";
 import level1 from "./level1";
 import level2 from "./level2";
 import level3 from "./level3";
@@ -20,7 +21,7 @@ import level6 from "./level6";
 import level7 from "./level7";
 import level8 from "./level8";
 import level9 from "./level9";
-import levelFinal from "./levelFinal";
+import level10 from "./level10";
 
 // Keep an odd number of levels to make it work.
 export const levels: Array<() => LevelObject> = [
@@ -33,6 +34,7 @@ export const levels: Array<() => LevelObject> = [
   level7,
   level8,
   level9,
+  level10,
   levelFinal,
 ];
 
@@ -52,7 +54,12 @@ export function initLevel(camera: Camera, levelId = 1) {
   level.objects.forEach((object: any) => {
     if (object.box) {
       gameObjects.push(
-        new Box(object.box.pos, object.box.width, object.box.height)
+        new Box(
+          object.box.pos,
+          object.box.width,
+          object.box.height,
+          object.box.canBounce || false
+        )
       );
     } else if (object.ropeContactPoint) {
       gameObjects.push(

@@ -457,6 +457,7 @@
                 ...obj.box.pos,
                 width: obj.box.width,
                 height: obj.box.height,
+                canBounce: obj.box.canBounce || false,
                 zIndex: obj.zIndex || 0,
                 ref: obj,
               };
@@ -719,7 +720,12 @@
               break;
             case "box":
               this.level.objects.push({
-                box: { pos: { x, y }, width: 200, height: 200 },
+                box: {
+                  pos: { x, y },
+                  width: 200,
+                  height: 200,
+                  canBounce: false,
+                },
                 zIndex: 0, // Default z-index for rendering order
               });
               break;
@@ -841,6 +847,20 @@
               this.updateObjectReference();
               this.render();
             });
+
+            // Add checkbox for canBounce
+            const canBounceLabel = document.createElement("label");
+            canBounceLabel.textContent = "Can Bounce";
+            const canBounceInput = document.createElement("input");
+            canBounceInput.type = "checkbox";
+            canBounceInput.checked = this.selectedObject.canBounce || false;
+            canBounceInput.addEventListener("change", (e) => {
+              this.selectedObject.canBounce = e.target.checked;
+              this.updateObjectReference();
+              this.render();
+            });
+            panel.appendChild(canBounceLabel);
+            panel.appendChild(canBounceInput);
           }
 
           if (this.selectedObject.type === "rope") {
@@ -930,6 +950,7 @@
               ref.box.pos.y = this.selectedObject.y;
               ref.box.width = this.selectedObject.width;
               ref.box.height = this.selectedObject.height;
+              ref.box.canBounce = this.selectedObject.canBounce;
               ref.zIndex = this.selectedObject.zIndex;
             } else if (ref.pickup) {
               ref.pickup.pos.x = this.selectedObject.x;
@@ -999,6 +1020,18 @@
                 obj.box.width,
                 obj.box.height
               );
+
+              // Add white stroke if canBounce is true
+              if (obj.box.canBounce) {
+                this.ctx.strokeStyle = "white";
+                this.ctx.lineWidth = 3 / this.scale;
+                this.ctx.strokeRect(
+                  obj.box.pos.x,
+                  obj.box.pos.y,
+                  obj.box.width,
+                  obj.box.height
+                );
+              }
             }
 
             if (obj.pickup) {
@@ -1236,7 +1269,15 @@ export default function getLevel() {
       .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0)) // Sort by z-index
       .map((obj) => {
         if (obj.box) {
-          return `\n      { box: { pos: Vector(${obj.box.pos.x}, ${obj.box.pos.y}), width: ${obj.box.width}, height: ${obj.box.height} } }`;
+          let boxStr = `\n      { box: { pos: Vector(${obj.box.pos.x}, ${obj.box.pos.y}), width: ${obj.box.width}, height: ${obj.box.height}`;
+
+          // Add canBounce if it's true
+          if (obj.box.canBounce) {
+            boxStr += `, canBounce: ${obj.box.canBounce}`;
+          }
+
+          boxStr += ` } }`;
+          return boxStr;
         }
         if (obj.pickup) {
           return `\n      { pickup: { pos: Vector(${obj.pickup.pos.x}, ${obj.pickup.pos.y}) } }`;
