@@ -12,7 +12,7 @@ import { smoothstep } from "./mathUtils";
 
 export class RopeContactPoint implements MyGameEntity {
   pos: Vector;
-  radius: number;
+  radius: number = 40;
   rotation: number = 0;
   type = GameObjectType.RopeContactPoint;
   isHighlighted: boolean = false;
@@ -30,7 +30,6 @@ export class RopeContactPoint implements MyGameEntity {
 
   constructor(
     pos: Vector,
-    radius: number,
     isActive: boolean = true,
     canActivate: boolean = false,
     canMove: boolean = false,
@@ -39,7 +38,6 @@ export class RopeContactPoint implements MyGameEntity {
     moveTime: number = 2000
   ) {
     this.pos = pos;
-    this.radius = radius;
     this.isActive = isActive;
     this.canActivate = canActivate;
     this.canMove = canMove;
@@ -83,7 +81,7 @@ export class RopeContactPoint implements MyGameEntity {
     if (this.canMove) {
       context.save();
       context.strokeStyle = colorGray;
-      context.lineWidth = 3;
+      context.lineWidth = 12;
       context.setLineDash([8, 8]);
       context.beginPath();
       context.moveTo(this.startPoint.x, this.startPoint.y);
