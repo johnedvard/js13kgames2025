@@ -82,9 +82,10 @@ function resolveCircleRectangleCollision(
       } else {
         player.pos.x = rectRight + circleRadius;
       }
-      // Reflect velocity for both axes
-      player.velocity.x = -player.velocity.x;
-      player.velocity.y = -player.velocity.y;
+      // Reflect velocity for both axes and add a small speed boost
+      const boost = 1.2; // 20% speed boost
+      player.velocity.x = -player.velocity.x * boost;
+      player.velocity.y = -player.velocity.y * boost;
       platform.triggerBounce();
     } else {
       // Original non-bounce logic

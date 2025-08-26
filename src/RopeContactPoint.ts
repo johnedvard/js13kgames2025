@@ -15,31 +15,65 @@ export class RopeContactPoint implements MyGameEntity {
   rotation: number = 0;
   type = GameObjectType.RopeContactPoint;
   isHighlighted: boolean = false;
-  isActive: boolean = true; // New property to control ON/OFF state
-  canActivate: boolean = true; // New property to control activation state
+  isActive: boolean = true; // ON/OFF state
+  canActivate: boolean = true; // Activation state
   activationTime = 3000;
   timeSinceActivated = 0;
+  // Movement properties
+  canMove: boolean = false;
+  startPoint: Vector | null = null;
+  endPoint: Vector | null = null;
+  moveTime: number = 2000; // ms to move from start to end
+  moveElapsed: number = 0;
+  movingForward: boolean = true;
 
   constructor(
     pos: Vector,
     radius: number,
     isActive: boolean = true,
-    canActivate: boolean = false
+    canActivate: boolean = false,
+    canMove: boolean = false,
+    startPoint: Vector | null = null,
+    endPoint: Vector | null = null,
+    moveTime: number = 2000
   ) {
     this.pos = pos;
     this.radius = radius;
     this.isActive = isActive;
     this.canActivate = canActivate;
+    this.canMove = canMove;
+    this.startPoint = startPoint || pos;
+    this.endPoint = endPoint || pos;
+    this.moveTime = moveTime;
   }
 
   update() {
     this.rotation += 0.02; // Rotate slowly over time
 
+    // Movement logic
+    if (this.canMove && this.startPoint && this.endPoint) {
+      this.moveElapsed += 16.67; // Assuming 60 FPS
+      let t = this.moveElapsed / this.moveTime;
+      if (t > 1) {
+        t = 1;
+        // Reverse direction at end
+        this.moveElapsed = 0;
+        this.movingForward = !this.movingForward;
+        // Swap start/end for back-and-forth
+        const temp = this.startPoint;
+        this.startPoint = this.endPoint;
+        this.endPoint = temp;
+      }
+      // Lerp position
+      this.pos = Vector(
+        this.startPoint.x + (this.endPoint.x - this.startPoint.x) * t,
+        this.startPoint.y + (this.endPoint.y - this.startPoint.y) * t
+      );
+    }
+
     // Handle automatic activation/deactivation if canActivate is true
     if (this.canActivate) {
       this.timeSinceActivated += 16.67; // Assuming 60 FPS, so ~16.67ms per frame
-
-      // Toggle activation state when the activation time has passed
       if (this.timeSinceActivated >= this.activationTime) {
         this.toggleActive();
         this.timeSinceActivated = 0; // Reset the timer
@@ -48,6 +82,19 @@ export class RopeContactPoint implements MyGameEntity {
   }
 
   render(context: CanvasRenderingContext2D) {
+    // Draw dotted line from startPoint to endPoint if moving
+    if (this.canMove && this.startPoint && this.endPoint) {
+      context.save();
+      context.strokeStyle = colorGray;
+      context.lineWidth = 3;
+      context.setLineDash([8, 8]);
+      context.beginPath();
+      context.moveTo(this.startPoint.x, this.startPoint.y);
+      context.lineTo(this.endPoint.x, this.endPoint.y);
+      context.stroke();
+      context.setLineDash([]);
+      context.restore();
+    }
     context.save();
 
     // Render white highlight circle behind everything if this is the closest rope point
