@@ -71,13 +71,13 @@ function resolveCircleRectangleCollision(
     );
 
     // Original non-bounce logic
-    if (minPenetration === penetrationTop) {
+    if (minPenetration == penetrationTop) {
       player.pos.y = rectTop - circleRadius;
       if (player.velocity.y > 0) player.velocity.y = 0;
-    } else if (minPenetration === penetrationBottom) {
+    } else if (minPenetration == penetrationBottom) {
       player.pos.y = rectBottom + circleRadius;
       if (player.velocity.y < 0) player.velocity.y = 0;
-    } else if (minPenetration === penetrationLeft) {
+    } else if (minPenetration == penetrationLeft) {
       player.pos.x = rectLeft - circleRadius;
       if (player.velocity.x > 0) player.velocity.x = 0;
     } else {
@@ -124,10 +124,10 @@ function resolveCircleRectangleCollision(
 export function handleOtherCollisions(objects: MyGameEntity[]): void {
   // Check collisions between objects (circles) and platforms (rectangles)
   for (const o of objects) {
-    if (o.type === GameObjectType.Ball) {
+    if (o.type == GameObjectType.Ball) {
       objects.forEach((object) => {
         const ball = o as Ball;
-        if (ball === object) return;
+        if (ball == object) return;
         if (
           isCircleRectangleColliding(
             ball.pos.add(Vector(-ball.radius, ball.radius)), // Circle center
@@ -137,7 +137,7 @@ export function handleOtherCollisions(objects: MyGameEntity[]): void {
             object.height!
           )
         ) {
-          if (object.type === GameObjectType.Platform) {
+          if (object.type == GameObjectType.Platform) {
             resolveCircleRectangleCollision(ball, object as Box);
           }
         }
@@ -152,7 +152,7 @@ export function handlePlayerCollisions(
 ): void {
   // Check collisions between player (circle) and platforms (rectangles)
   for (const o of objects) {
-    if (o === player) continue;
+    if (o == player) continue;
     if (
       isCircleRectangleColliding(
         player.pos.add(Vector(-player.radius, player.radius)), // Circle center
@@ -162,15 +162,15 @@ export function handlePlayerCollisions(
         o.height!
       )
     ) {
-      if (o.type === GameObjectType.Platform) {
+      if (o.type == GameObjectType.Platform) {
         resolveCircleRectangleCollision(player, o as Box);
-      } else if (o.type === GameObjectType.Ball) {
+      } else if (o.type == GameObjectType.Ball) {
         resolveCircleRectangleCollision(player, o as Box);
-      } else if (o.type === GameObjectType.Pickup) {
+      } else if (o.type == GameObjectType.Pickup) {
         (o as Pickup).collect();
-      } else if (o.type === GameObjectType.Shuriken) {
+      } else if (o.type == GameObjectType.Shuriken) {
         emit(GameEvent.kill);
-      } else if (o.type === GameObjectType.Goal) {
+      } else if (o.type == GameObjectType.Goal) {
         emit(GameEvent.goal);
       }
     }

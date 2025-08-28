@@ -59,7 +59,7 @@ on(GameEvent.play, ({ levelId }: any) => {
 });
 
 on(GameEvent.kill, () => {
-  if (_player && _player.state === "a") {
+  if (_player && _player.state == "a") {
     _player.setState("d");
     handlePlayerDead();
   }
@@ -77,7 +77,7 @@ on(GameEvent.goal, () => {
 
 on(GameEvent.up, ({ x, y }: any) => {
   // Handle main menu clicks when in select scene
-  if (activeScene === SceneId.Menu) {
+  if (activeScene == SceneId.Menu) {
     mainMenu.handleClick(x, y);
     mainMenu.handleDragEnd();
     mainMenu.handleMouseUp(); // Handle button press state
@@ -86,7 +86,7 @@ on(GameEvent.up, ({ x, y }: any) => {
 
 on(GameEvent.down, ({ x, y }: any) => {
   // Handle main menu drag start when in select scene
-  if (activeScene === SceneId.Menu) {
+  if (activeScene == SceneId.Menu) {
     mainMenu.handleMouseDown(x, y); // Handle button press state
     if (mainMenu.isPointInMainMenu(x, y)) {
       mainMenu.handleDragStart(y);
@@ -96,7 +96,7 @@ on(GameEvent.down, ({ x, y }: any) => {
 
 on(GameEvent.drag, ({ detail }: any) => {
   // Handle main menu drag when in select scene
-  if (activeScene === SceneId.Menu) {
+  if (activeScene == SceneId.Menu) {
     if (mainMenu.isDragging) {
       mainMenu.handleDragMove(detail.diffY + mainMenu.lastMouseY);
     }
@@ -105,7 +105,7 @@ on(GameEvent.drag, ({ detail }: any) => {
 
 on(GameEvent.wheel, ({ deltaY, x, y }: any) => {
   // Handle main menu wheel scroll when in select scene
-  if (activeScene === SceneId.Menu) {
+  if (activeScene == SceneId.Menu) {
     if (mainMenu.isPointInMainMenu(x, y)) {
       mainMenu.handleScroll(deltaY);
     }
@@ -127,7 +127,7 @@ function highlightClosestRopeContactPoint() {
 const mainLoop = GameLoop({
   blur: true, // Prevent pausing when window loses focus
   update: function () {
-    if (activeScene === SceneId.Menu) {
+    if (activeScene == SceneId.Menu) {
       mainMenu.update();
       //   camera?.follow(currentCanvasPos);
       selectLevelObjects.forEach((object: any) => object.update());
@@ -145,7 +145,7 @@ const mainLoop = GameLoop({
     camera.clear(context);
     camera.apply(context);
 
-    if (activeScene === SceneId.Menu) {
+    if (activeScene == SceneId.Menu) {
       mainMenu.render(context);
       selectLevelObjects.forEach((object: any) => object.render(context));
     } else {
@@ -203,7 +203,7 @@ const transitionLoop = GameLoop({
     sceneTransition?.update();
     if (!fadeinComplete && sceneTransition.isFadeInComplete()) {
       fadeinComplete = true;
-      if (nextScene === SceneId.Menu) {
+      if (nextScene == SceneId.Menu) {
         activeScene = SceneId.Menu;
         // Refresh the main menu buttons to show updated completion data
         mainMenu.refreshButtons();
@@ -211,7 +211,7 @@ const transitionLoop = GameLoop({
           object && object.destroy && object.destroy();
         });
         mainMenuObjects.length = 0;
-      } else if (nextScene === SceneId.Level) {
+      } else if (nextScene == SceneId.Level) {
         activeScene = SceneId.Level;
         startLevel(SceneId.Level, currentLevelId);
         destroySelectLevelObjects();
@@ -296,7 +296,7 @@ function handleLevelClear() {
 
   // assume we are playing regular level
   const pickups = _objects.filter(
-    (object: any) => object.type === GameObjectType.Pickup
+    (object: any) => object.type == GameObjectType.Pickup
   );
   let numCollected = 0;
   pickups.forEach((pickup: any) => {

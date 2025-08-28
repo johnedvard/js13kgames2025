@@ -35,10 +35,10 @@ export class SceneTransition {
   }
 
   handleState() {
-    if (this.state === TransitionState.FadeIn && this.isFadeInComplete()) {
+    if (this.state == TransitionState.FadeIn && this.isFadeInComplete()) {
       this.state = TransitionState.FadeOut;
     } else if (
-      this.state === TransitionState.FadeOut &&
+      this.state == TransitionState.FadeOut &&
       this.isFadeOutComplete()
     ) {
       this.state = TransitionState.Complete;

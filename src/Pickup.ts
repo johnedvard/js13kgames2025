@@ -128,9 +128,9 @@ export class Pickup implements MyGameEntity {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    if (this.state === "a") {
+    if (this.state == "a") {
       this.renderClover(ctx);
-    } else if (this.state === "c") {
+    } else if (this.state == "c") {
       this.renderCloverBurst(ctx);
     }
   }
@@ -263,7 +263,7 @@ export class Pickup implements MyGameEntity {
   }
 
   collect() {
-    if (this.state === "c" || this.state === "d") return; // Prevent double collection
+    if (this.state == "c" || this.state == "d") return; // Prevent double collection
     this.collected = true;
     playPickup();
     this.state = "c";

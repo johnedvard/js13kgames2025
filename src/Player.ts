@@ -98,7 +98,7 @@ export class Player implements MyGameEntity {
           leftAttachPos.x,
           leftAttachPos.y + i * this.threadSegmentLength
         ),
-        pinned: i === 0, // First point is pinned to cat center
+        pinned: i == 0, // First point is pinned to cat center
       };
       this.leftThread.push(point);
     }
@@ -116,7 +116,7 @@ export class Player implements MyGameEntity {
           rightAttachPos.x,
           rightAttachPos.y + i * this.threadSegmentLength
         ),
-        pinned: i === 0, // First point is pinned to cat center
+        pinned: i == 0, // First point is pinned to cat center
       };
       this.rightThread.push(point);
     }
@@ -310,7 +310,7 @@ export class Player implements MyGameEntity {
     this.catShadowCanvas = null;
   }
   render(context: CanvasRenderingContext2D) {
-    if (this.state === "d") {
+    if (this.state == "d") {
       return;
     }
 
@@ -362,7 +362,7 @@ export class Player implements MyGameEntity {
     context.beginPath();
     context.moveTo(thread[0].pos.x + offsetX, thread[0].pos.y + offsetY);
 
-    if (thread.length === 2) {
+    if (thread.length == 2) {
       // If only 2 points, draw a straight line
       context.lineTo(thread[1].pos.x + offsetX, thread[1].pos.y + offsetY);
     } else {
@@ -538,7 +538,7 @@ export class Player implements MyGameEntity {
     context.restore();
   }
   update() {
-    if (this.state === "d") {
+    if (this.state == "d") {
       return;
     }
 

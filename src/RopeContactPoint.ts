@@ -55,7 +55,7 @@ export class RopeContactPoint implements MyGameEntity {
     if (this.canMove) {
       this.moveElapsed += 16.67; // Assuming 60 FPS
       let t = this.moveElapsed / this.moveTime;
-      let easeT = this.moveDirection === 1 ? t : 1 - t;
+      let easeT = this.moveDirection == 1 ? t : 1 - t;
       easeT = smoothstep(easeT);
       this.pos = Vector(
         lerp(this.startPos.x, this.endPos.x, easeT),

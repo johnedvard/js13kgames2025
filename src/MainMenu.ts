@@ -137,7 +137,7 @@ export class MainMenu implements MyGameEntity {
 
       // Check if this button is being pressed (only while mouse is held down)
       const isPressedButton =
-        this.isMouseDown && this.pressedLevelButton === levelId;
+        this.isMouseDown && this.pressedLevelButton == levelId;
       const pressOffset = isPressedButton ? shadowOffset : 0;
 
       // Draw shadow first (always draw shadow like arrow buttons)
@@ -375,7 +375,7 @@ export class MainMenu implements MyGameEntity {
 
   private isLevelPlayable(levelId: number): boolean {
     // Level 1 is always playable
-    if (levelId === 1) return true;
+    if (levelId == 1) return true;
 
     // Find the highest completed level
     let highestCompleted = 0;
@@ -401,9 +401,9 @@ export class MainMenu implements MyGameEntity {
     // Check if click is on scroll buttons first
     const scrollButtonClick = this.isPointInScrollButton(x, y);
     if (scrollButtonClick) {
-      if (scrollButtonClick === "u") {
+      if (scrollButtonClick == "u") {
         this.handleScroll(-750); // Scroll up by much more pixels (5x faster)
-      } else if (scrollButtonClick === "d") {
+      } else if (scrollButtonClick == "d") {
         this.handleScroll(750); // Scroll down by much more pixels (5x faster)
       }
       return true;
@@ -498,7 +498,7 @@ export class MainMenu implements MyGameEntity {
 
   private startPress(type: "l" | "s", id: number | "u" | "d") {
     this.isMouseDown = true;
-    if (type === "l") {
+    if (type == "l") {
       this.pressedLevelButton = id as number;
     } else {
       this.pressedScrollButton = id as "u" | "d";
@@ -516,7 +516,7 @@ export class MainMenu implements MyGameEntity {
   }
 
   private getShakeRotation(): number {
-    if (this.shakeButtonId === null || this.shakeTimer >= this.shakeDuration) {
+    if (this.shakeButtonId == null || this.shakeTimer >= this.shakeDuration) {
       return 0;
     }
 
@@ -709,7 +709,7 @@ export class MainMenu implements MyGameEntity {
     scrollAreaLeft: number,
     listWidth: number
   ) {
-    if (this.shakeButtonId === null) return;
+    if (this.shakeButtonId == null) return;
 
     const levelId = this.shakeButtonId;
     const buttonIndex = levelId - 1; // Convert to 0-based index
@@ -840,9 +840,9 @@ export class MainMenu implements MyGameEntity {
     // Draw main UP triangle - white if can scroll up, dark gray if disabled
     // Apply press offset if this button is being pressed (only while mouse is held down)
     const upPressOffsetX =
-      this.isMouseDown && this.pressedScrollButton === "u" ? shadowOffset : 0;
+      this.isMouseDown && this.pressedScrollButton == "u" ? shadowOffset : 0;
     const upPressOffsetY =
-      this.isMouseDown && this.pressedScrollButton === "u" ? shadowOffset : 0;
+      this.isMouseDown && this.pressedScrollButton == "u" ? shadowOffset : 0;
     this.drawTriangle(
       ctx,
       centerX + upPressOffsetX,
@@ -870,9 +870,9 @@ export class MainMenu implements MyGameEntity {
     // Draw main DOWN triangle - white if can scroll down, dark gray if disabled
     // Apply press offset if this button is being pressed (only while mouse is held down)
     const downPressOffsetX =
-      this.isMouseDown && this.pressedScrollButton === "d" ? shadowOffset : 0;
+      this.isMouseDown && this.pressedScrollButton == "d" ? shadowOffset : 0;
     const downPressOffsetY =
-      this.isMouseDown && this.pressedScrollButton === "d" ? shadowOffset : 0;
+      this.isMouseDown && this.pressedScrollButton == "d" ? shadowOffset : 0;
     this.drawTriangle(
       ctx,
       centerX + downPressOffsetX,
