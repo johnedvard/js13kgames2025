@@ -43,8 +43,7 @@ export class RopeContactPoint implements MyGameEntity {
     this.endPos = endPos || pos;
     this.moveTime = moveTime;
     if (endPos?.x && this.startPos?.x) {
-      this.canMove =
-        endPos.x !== this.startPos.x || endPos.y !== this.startPos.y;
+      this.canMove = endPos.x != this.startPos.x || endPos.y != this.startPos.y;
     }
   }
 

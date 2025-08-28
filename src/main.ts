@@ -117,7 +117,7 @@ function highlightClosestRopeContactPoint() {
 
   const closestRopeContactPoint = findClosestRopeContactPoint(_player.pos);
   if (!closestRopeContactPoint) return;
-  if (_closestRopeContactPoint !== closestRopeContactPoint) {
+  if (_closestRopeContactPoint != closestRopeContactPoint) {
     _closestRopeContactPoint?.setHighlight(false);
     closestRopeContactPoint.setHighlight(true);
     _closestRopeContactPoint = closestRopeContactPoint;
@@ -327,7 +327,7 @@ export function findClosestRopeContactPoint(
   let closestDistance = Infinity;
 
   _objects.forEach((object) => {
-    if (object.type !== GameObjectType.RopeContactPoint) return;
+    if (object.type != GameObjectType.RopeContactPoint) return;
     if (!(object as RopeContactPoint).isActive) return;
     const distance = object.pos.distance(pos);
     if (distance < closestDistance) {

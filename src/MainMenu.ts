@@ -412,7 +412,7 @@ export class MainMenu implements MyGameEntity {
     // Check if click is on a level button
     const clickedLevel = this.isPointInLevelButton(x, y);
 
-    if (clickedLevel !== null) {
+    if (clickedLevel != null) {
       // Check if the level is playable before allowing the click
       if (this.isLevelPlayable(clickedLevel)) {
         // Emit play event with the selected level ID
@@ -441,7 +441,7 @@ export class MainMenu implements MyGameEntity {
 
     // Check if mouse down is on a level button
     const clickedLevel = this.isPointInLevelButton(x, y);
-    if (clickedLevel !== null) {
+    if (clickedLevel != null) {
       // Make all level buttons pressable, regardless of whether they're playable
       this.startPress("l", clickedLevel);
       return true;
@@ -539,7 +539,7 @@ export class MainMenu implements MyGameEntity {
     }
 
     // Update shake animation
-    if (this.shakeButtonId !== null) {
+    if (this.shakeButtonId != null) {
       this.shakeTimer += 1 / 60; // Assuming 60 FPS
       if (this.shakeTimer >= this.shakeDuration) {
         this.shakeButtonId = null;
@@ -670,7 +670,7 @@ export class MainMenu implements MyGameEntity {
     ctx.clip();
 
     // If there's a shaking button, we need to draw it separately with rotation
-    if (this.shakeButtonId !== null) {
+    if (this.shakeButtonId != null) {
       // Draw the offscreen canvas but exclude the shaking button area
       ctx.drawImage(
         this.offscreenCanvas,
