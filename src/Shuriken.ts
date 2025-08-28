@@ -1,10 +1,10 @@
-import { Vector } from "kontra";
+import { MyVector } from "./Vector";
 import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
 import { colorBlack } from "./colorUtils";
 
 export class Shuriken implements MyGameEntity {
-  pos: Vector;
+  pos: MyVector;
   type = GameObjectType.Shuriken;
   width = 40;
   height = 50;
@@ -18,7 +18,7 @@ export class Shuriken implements MyGameEntity {
   private bladeCanvas: OffscreenCanvas | null = null;
   private bladeContext: OffscreenCanvasRenderingContext2D | null = null;
 
-  constructor(startPos: Vector) {
+  constructor(startPos: MyVector) {
     this.pos = startPos;
     this.initializeBladeCache();
   }

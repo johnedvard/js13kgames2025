@@ -1,6 +1,6 @@
-import { Vector } from "kontra";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
+import { Vector, MyVector } from "./Vector";
 import { colorBlack } from "./colorUtils";
 
 export class Ball implements MyGameEntity {
@@ -10,7 +10,7 @@ export class Ball implements MyGameEntity {
   radius = 15;
   gravity = 0.3;
 
-  constructor(startPos: Vector, private color: string) {
+  constructor(startPos: MyVector, private color: string) {
     this.pos = startPos || Vector(0, 0);
 
     // Add initial random speed

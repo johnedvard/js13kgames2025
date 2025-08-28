@@ -487,15 +487,15 @@
                 y,
                 obj.ropeContactPoint.pos.x,
                 obj.ropeContactPoint.pos.y,
-                obj.ropeContactPoint.radius || 20
+                40
               )
             ) {
               return {
                 type: "rope",
                 ...obj.ropeContactPoint.pos,
-                radius: obj.ropeContactPoint.radius,
                 canActivate: obj.ropeContactPoint.canActivate || false,
                 isActive: obj.ropeContactPoint.isActive !== false, // Default to true
+                ...obj.ropeContactPoint.endPos,
                 ref: obj,
               };
             }
@@ -743,36 +743,30 @@
               this.level.objects.push({
                 ropeContactPoint: {
                   pos: { x, y },
-                  radius: 40,
+                  endPos: { x, y }, // Default endpoint is same as start
                   canActivate: false,
                   isActive: true,
                 },
               });
               break;
             case "background":
-              // Add a new point to the background polygon
+              // ...existing code...
               if (!this.level.background) {
                 this.level.background = { positions: [] };
               }
               if (!this.level.background.positions) {
                 this.level.background.positions = [];
               }
-
-              // Find the best position to insert the new point
+              // ...existing code...
               const positions = this.level.background.positions;
               if (positions.length < 2) {
-                // If we have 0 or 1 points, just add to the end
                 positions.push({ x, y });
               } else {
-                // Find the edge that's closest to the new point
-                let bestIndex = positions.length; // Default to end
+                let bestIndex = positions.length;
                 let minDistance = Infinity;
-
                 for (let i = 0; i < positions.length; i++) {
                   const p1 = positions[i];
-                  const p2 = positions[(i + 1) % positions.length]; // Next point (wrapping to start)
-
-                  // Calculate distance from point to line segment
+                  const p2 = positions[(i + 1) % positions.length];
                   const distance = this.distanceToLineSegment(
                     x,
                     y,
@@ -781,14 +775,11 @@
                     p2.x,
                     p2.y
                   );
-
                   if (distance < minDistance) {
                     minDistance = distance;
-                    bestIndex = i + 1; // Insert after point i
+                    bestIndex = i + 1;
                   }
                 }
-
-                // Insert the point at the best position
                 positions.splice(bestIndex, 0, { x, y });
               }
               break;
@@ -799,9 +790,7 @@
         updatePropertyPanel() {
           const panel = document.getElementById("property-fields");
           panel.innerHTML = "";
-
           if (!this.selectedObject) return;
-
           const createInput = (label, value, callback) => {
             const input = document.createElement("input");
             input.type = "number";
@@ -809,46 +798,38 @@
             input.placeholder = label;
             input.value = value;
             input.addEventListener("input", callback);
-
             const labelEl = document.createElement("label");
             labelEl.textContent = label;
-
             panel.appendChild(labelEl);
             panel.appendChild(input);
           };
-
           createInput("X", this.selectedObject.x, (e) => {
             this.selectedObject.x = parseFloat(e.target.value) || 0;
             this.updateObjectReference();
             this.render();
           });
-
           createInput("Y", this.selectedObject.y, (e) => {
             this.selectedObject.y = parseFloat(e.target.value) || 0;
             this.updateObjectReference();
             this.render();
           });
-
           if (this.selectedObject.type === "box") {
             createInput("Width", this.selectedObject.width, (e) => {
               this.selectedObject.width = parseFloat(e.target.value) || 1;
               this.updateObjectReference();
               this.render();
             });
-
             createInput("Height", this.selectedObject.height, (e) => {
               this.selectedObject.height = parseFloat(e.target.value) || 1;
               this.updateObjectReference();
               this.render();
             });
-
             createInput("Z-Index", this.selectedObject.zIndex || 0, (e) => {
               this.selectedObject.zIndex = parseInt(e.target.value) || 0;
               this.updateObjectReference();
               this.render();
             });
-
-            // Add checkbox for canBounce
+            // ...existing code for canBounce...
             const canBounceLabel = document.createElement("label");
             canBounceLabel.textContent = "Can Bounce";
             const canBounceInput = document.createElement("input");
@@ -862,15 +843,8 @@
             panel.appendChild(canBounceLabel);
             panel.appendChild(canBounceInput);
           }
-
           if (this.selectedObject.type === "rope") {
-            createInput("Radius", this.selectedObject.radius, (e) => {
-              this.selectedObject.radius = parseFloat(e.target.value) || 20;
-              this.updateObjectReference();
-              this.render();
-            });
-
-            // Add checkbox for canActivate
+            // ...existing code for canActivate and isActive...
             const canActivateLabel = document.createElement("label");
             canActivateLabel.textContent = "Can Activate";
             const canActivateInput = document.createElement("input");
@@ -883,13 +857,11 @@
             });
             panel.appendChild(canActivateLabel);
             panel.appendChild(canActivateInput);
-
-            // Add checkbox for isActive
             const isActiveLabel = document.createElement("label");
             isActiveLabel.textContent = "Is Active";
             const isActiveInput = document.createElement("input");
             isActiveInput.type = "checkbox";
-            isActiveInput.checked = this.selectedObject.isActive !== false; // Default to true
+            isActiveInput.checked = this.selectedObject.isActive !== false;
             isActiveInput.addEventListener("change", (e) => {
               this.selectedObject.isActive = e.target.checked;
               this.updateObjectReference();
@@ -897,10 +869,28 @@
             });
             panel.appendChild(isActiveLabel);
             panel.appendChild(isActiveInput);
+            // Add inputs for end position
+            createInput(
+              "End X",
+              this.selectedObject.endX ?? this.selectedObject.x,
+              (e) => {
+                this.selectedObject.endX = parseFloat(e.target.value) || 0;
+                this.updateObjectReference();
+                this.render();
+              }
+            );
+            createInput(
+              "End Y",
+              this.selectedObject.endY ?? this.selectedObject.y,
+              (e) => {
+                this.selectedObject.endY = parseFloat(e.target.value) || 0;
+                this.updateObjectReference();
+                this.render();
+              }
+            );
           }
-
           if (this.selectedObject.type === "backgroundPoint") {
-            // Add delete button for background points
+            // ...existing code for backgroundPoint delete...
             const deleteBtn = document.createElement("button");
             deleteBtn.textContent = "Delete Point";
             deleteBtn.onclick = () => {
@@ -931,7 +921,6 @@
             this.level.goalPos.x = this.selectedObject.x;
             this.level.goalPos.y = this.selectedObject.y;
           } else if (this.selectedObject.type === "backgroundPoint") {
-            // Update background point coordinates
             if (
               this.selectedBackgroundPoint &&
               this.backgroundPointIndex !== -1
@@ -961,28 +950,34 @@
             } else if (ref.ropeContactPoint) {
               ref.ropeContactPoint.pos.x = this.selectedObject.x;
               ref.ropeContactPoint.pos.y = this.selectedObject.y;
-              ref.ropeContactPoint.radius = this.selectedObject.radius;
               ref.ropeContactPoint.canActivate =
                 this.selectedObject.canActivate;
               ref.ropeContactPoint.isActive = this.selectedObject.isActive;
+              // Update endPos
+              if (!ref.ropeContactPoint.endPos) {
+                ref.ropeContactPoint.endPos = {
+                  x: this.selectedObject.endX ?? this.selectedObject.x,
+                  y: this.selectedObject.endY ?? this.selectedObject.y,
+                };
+              } else {
+                ref.ropeContactPoint.endPos.x =
+                  this.selectedObject.endX ?? this.selectedObject.x;
+                ref.ropeContactPoint.endPos.y =
+                  this.selectedObject.endY ?? this.selectedObject.y;
+              }
             }
           }
         }
 
         render() {
           this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-          // Save context and apply scale
           this.ctx.save();
           this.ctx.scale(this.scale, this.scale);
-
-          // Draw grid (in world coordinates)
           this.ctx.strokeStyle = "#f0f0f0";
-          this.ctx.lineWidth = 1 / this.scale; // Adjust line width for scale
-          const gridSize = 50 / this.scale; // Grid every 50 world units
+          this.ctx.lineWidth = 1 / this.scale;
+          const gridSize = 50 / this.scale;
           const maxX = this.canvas.width / this.scale;
           const maxY = this.canvas.height / this.scale;
-
           for (let x = 0; x < maxX; x += gridSize) {
             this.ctx.beginPath();
             this.ctx.moveTo(x, 0);
@@ -995,14 +990,11 @@
             this.ctx.lineTo(maxX, y);
             this.ctx.stroke();
           }
-
-          // Draw objects (sorted by z-index for proper layering)
           const sortedObjects = [...this.level.objects].sort((a, b) => {
             const aZ = a.zIndex || 0;
             const bZ = b.zIndex || 0;
             return aZ - bZ;
           });
-
           sortedObjects.forEach((obj) => {
             if (obj.box) {
               this.ctx.fillStyle = "#8B4513";
@@ -1020,8 +1012,6 @@
                 obj.box.width,
                 obj.box.height
               );
-
-              // Add white stroke if canBounce is true
               if (obj.box.canBounce) {
                 this.ctx.strokeStyle = "white";
                 this.ctx.lineWidth = 3 / this.scale;
@@ -1033,7 +1023,6 @@
                 );
               }
             }
-
             if (obj.pickup) {
               this.ctx.fillStyle = "#00ff00";
               this.ctx.beginPath();
@@ -1049,7 +1038,6 @@
               this.ctx.lineWidth = 2 / this.scale;
               this.ctx.stroke();
             }
-
             if (obj.shuriken) {
               this.ctx.fillStyle = "#ff00ff";
               this.ctx.beginPath();
@@ -1065,20 +1053,47 @@
               this.ctx.lineWidth = 2 / this.scale;
               this.ctx.stroke();
             }
-
             if (obj.ropeContactPoint) {
+              // Draw rope endpoint line if endPos exists
+              if (obj.ropeContactPoint.endPos) {
+                this.ctx.strokeStyle = "#007bff";
+                this.ctx.lineWidth = 2 / this.scale;
+                this.ctx.beginPath();
+                this.ctx.moveTo(
+                  obj.ropeContactPoint.pos.x,
+                  obj.ropeContactPoint.pos.y
+                );
+                this.ctx.lineTo(
+                  obj.ropeContactPoint.endPos.x,
+                  obj.ropeContactPoint.endPos.y
+                );
+                this.ctx.stroke();
+                // Draw endpoint marker
+                this.ctx.fillStyle = "#007bff";
+                this.ctx.beginPath();
+                this.ctx.arc(
+                  obj.ropeContactPoint.endPos.x,
+                  obj.ropeContactPoint.endPos.y,
+                  10,
+                  0,
+                  Math.PI * 2
+                );
+                this.ctx.fill();
+                this.ctx.strokeStyle = "black";
+                this.ctx.lineWidth = 2 / this.scale;
+                this.ctx.stroke();
+              }
               // Choose color based on active state
               if (obj.ropeContactPoint.isActive === false) {
-                this.ctx.fillStyle = "#808080"; // Gray for inactive
+                this.ctx.fillStyle = "#808080";
               } else {
-                this.ctx.fillStyle = "#8B4513"; // Brown for active
+                this.ctx.fillStyle = "#8B4513";
               }
-
               this.ctx.beginPath();
               this.ctx.arc(
                 obj.ropeContactPoint.pos.x,
                 obj.ropeContactPoint.pos.y,
-                obj.ropeContactPoint.radius,
+                40,
                 0,
                 Math.PI * 2
               );
@@ -1086,22 +1101,20 @@
               this.ctx.strokeStyle = "black";
               this.ctx.lineWidth = 2 / this.scale;
               this.ctx.stroke();
-
-              // Draw a dotted circle if canActivate is true
               if (obj.ropeContactPoint.canActivate) {
-                this.ctx.strokeStyle = "#FF6B35"; // Orange for activatable
+                this.ctx.strokeStyle = "#FF6B35";
                 this.ctx.lineWidth = 3 / this.scale;
                 this.ctx.setLineDash([5, 5]);
                 this.ctx.beginPath();
                 this.ctx.arc(
                   obj.ropeContactPoint.pos.x,
                   obj.ropeContactPoint.pos.y,
-                  obj.ropeContactPoint.radius + 5,
+                  45,
                   0,
                   Math.PI * 2
                 );
                 this.ctx.stroke();
-                this.ctx.setLineDash([]); // Reset line dash
+                this.ctx.setLineDash([]);
               }
             }
           });
@@ -1197,7 +1210,7 @@
                 this.selectedObject.type === "goal"
                   ? 32
                   : this.selectedObject.type === "rope"
-                  ? this.selectedObject.radius + 2
+                  ? 42
                   : 22;
               this.ctx.beginPath();
               this.ctx.arc(
@@ -1252,7 +1265,7 @@
 
       function exportLevel() {
         const level = editor.level;
-        const code = `import { Vector } from "kontra";
+        const code = `import { Vector } from "./Vector";
 
 export default function getLevel() {
   return {
@@ -1287,18 +1300,16 @@ export default function getLevel() {
         }
         if (obj.ropeContactPoint) {
           const rope = obj.ropeContactPoint;
-          let ropeStr = `\n      { ropeContactPoint: { pos: Vector(${rope.pos.x}, ${rope.pos.y}), radius: ${rope.radius}`;
-
-          // Add canActivate if it's true
+          let ropeStr = `\n      { ropeContactPoint: { pos: Vector(${rope.pos.x}, ${rope.pos.y})`;
+          if (rope.endPos) {
+            ropeStr += `, endPos: Vector(${rope.endPos.x}, ${rope.endPos.y})`;
+          }
           if (rope.canActivate) {
             ropeStr += `, canActivate: ${rope.canActivate}`;
           }
-
-          // Add isActive if it's not the default (true)
           if (rope.isActive === false) {
             ropeStr += `, isActive: ${rope.isActive}`;
           }
-
           ropeStr += ` } }`;
           return ropeStr;
         }

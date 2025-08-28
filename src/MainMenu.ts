@@ -1,4 +1,4 @@
-import { Vector, emit } from "kontra";
+import { emit } from "kontra";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
 import { numLevels } from "./levelutils";
@@ -15,6 +15,7 @@ import { getItem } from "./storageUtils";
 import { Pickup } from "./Pickup";
 import { GameEvent } from "./GameEvent";
 import { playButtonDisable, playGoal } from "./audio";
+import { Vector } from "./Vector";
 
 type MainMenuState = "h" | "v"; //hidden visible
 

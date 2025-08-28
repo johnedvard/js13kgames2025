@@ -1,4 +1,4 @@
-export enum GameObjectType {
+export const enum GameObjectType {
   Player = "p",
   Enemy = "e",
   Platform = "pl",

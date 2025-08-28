@@ -1,10 +1,10 @@
-import { Vector } from "kontra";
+import { MyVector } from "./Vector";
 import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
 import { colorBlack, colorWall, colorWhite } from "./colorUtils";
 
 export class Box implements MyGameEntity {
-  pos: Vector;
+  pos: MyVector;
   width: number;
   height: number;
   type = GameObjectType.Platform;
@@ -16,7 +16,7 @@ export class Box implements MyGameEntity {
   bounceDecay: number = 0.8;
 
   constructor(
-    pos: Vector,
+    pos: MyVector,
     width: number,
     height: number,
     canBounce: boolean = false

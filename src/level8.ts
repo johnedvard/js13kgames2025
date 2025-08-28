@@ -1,4 +1,4 @@
-import { Vector } from "kontra";
+import { Vector } from "./Vector";
 
 export default function getLevel() {
   return {
@@ -18,14 +18,12 @@ export default function getLevel() {
       {
         ropeContactPoint: {
           pos: Vector(1012, 1004),
-          radius: 40,
           canActivate: true,
         },
       },
       {
         ropeContactPoint: {
           pos: Vector(1628, 1204),
-          radius: 40,
           canActivate: true,
           isActive: false,
         },
@@ -33,14 +31,12 @@ export default function getLevel() {
       {
         ropeContactPoint: {
           pos: Vector(2208, 1388),
-          radius: 40,
           canActivate: true,
         },
       },
       {
         ropeContactPoint: {
           pos: Vector(2812, 1404),
-          radius: 40,
           canActivate: true,
           isActive: false,
         },

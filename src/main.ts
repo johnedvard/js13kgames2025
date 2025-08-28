@@ -1,4 +1,4 @@
-import { init, GameLoop, Vector, on } from "kontra";
+import { init, GameLoop, on } from "kontra";
 import { Camera } from "./Camera";
 import { SceneTransition } from "./SceneTransition";
 import { Player } from "./Player";
@@ -16,15 +16,18 @@ import { Ball } from "./Ball";
 import { colorAccent, colorBlack, colorGray, colorWhite } from "./colorUtils";
 import { MainMenu } from "./MainMenu";
 import { playDead, playGoal } from "./audio";
+import { MyVector, Vector } from "./Vector";
 
 const { canvas } = init("g");
 const { canvas: transitionCanvas } = init("t");
-// These are just in-game values, not the actual canvas size
-export const GAME_WIDTH = 2548;
+const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+const transitionContext = transitionCanvas.getContext(
+  "2d"
+) as CanvasRenderingContext2D;
 
 // Initialize main menu with canvas
 const mainMenu = new MainMenu(canvas);
-enum SceneId {
+const enum SceneId {
   Level = "l",
   Menu = "s",
 }
@@ -131,7 +134,7 @@ const mainLoop = GameLoop({
     } else {
       _objects.forEach((object) => object.update());
       levelPersistentObjects.forEach((object) => object.update());
-      camera?.follow(_player, { offset: Vector(100, 100), lerp: true });
+      camera?.follow(_player);
       // consider not adding levelpersitent objects to the collision detection
       handlePlayerCollisions(_player, [..._objects, ...levelPersistentObjects]);
       handleOtherCollisions([..._objects, ...levelPersistentObjects]);
@@ -139,7 +142,6 @@ const mainLoop = GameLoop({
     }
   },
   render: function () {
-    const context = canvas.getContext("2d") as CanvasRenderingContext2D;
     camera.clear(context);
     camera.apply(context);
 
@@ -222,10 +224,7 @@ const transitionLoop = GameLoop({
     }
   },
   render: function () {
-    const context = transitionCanvas.getContext(
-      "2d"
-    ) as CanvasRenderingContext2D;
-    sceneTransition?.render(context);
+    sceneTransition?.render(transitionContext);
   },
 });
 
@@ -322,7 +321,7 @@ function handleLevelClear() {
   transitionLoop.start();
 }
 export function findClosestRopeContactPoint(
-  pos: Vector
+  pos: MyVector
 ): RopeContactPoint | null {
   let closestObject = null;
   let closestDistance = Infinity;

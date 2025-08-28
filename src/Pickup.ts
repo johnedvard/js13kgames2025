@@ -1,4 +1,4 @@
-import { Vector } from "kontra";
+import { Vector, MyVector } from "./Vector";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
 import { colorAccent, colorBlack } from "./colorUtils";
@@ -29,7 +29,7 @@ export class Pickup implements MyGameEntity {
 
   private state: "c" | "d" | "a" = "a";
   collected = false;
-  constructor(startPos: Vector, private color = colorAccent) {
+  constructor(startPos: MyVector, private color = colorAccent) {
     this.pos = startPos;
     this.initializeCloverCache();
   }
@@ -161,7 +161,7 @@ export class Pickup implements MyGameEntity {
       rotation: number,
       offsetX: number,
       offsetY: number,
-      direction: Vector
+      direction: MyVector
     ) => {
       ctx.save();
 
@@ -197,7 +197,7 @@ export class Pickup implements MyGameEntity {
     };
 
     // Helper function to draw stalk
-    const drawStalk = (direction: Vector) => {
+    const drawStalk = (direction: MyVector) => {
       ctx.save();
 
       // Calculate position with burst movement

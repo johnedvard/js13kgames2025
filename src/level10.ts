@@ -1,8 +1,8 @@
-import { Vector } from "kontra";
+import { Vector } from "./Vector";
 
 export default function getLevel() {
   return {
-    playerPos: Vector(648, 1600),
+    playerPos: Vector(1008, 936),
     goalPos: Vector(1982, 636),
     background: {
       positions: [
@@ -13,41 +13,65 @@ export default function getLevel() {
       ],
     },
     objects: [
-      { box: { pos: Vector(200, 200), width: 200, height: 2600 } },
-      { shuriken: { pos: Vector(896, 2188) } },
-      { shuriken: { pos: Vector(1000, 1100) } },
-      { shuriken: { pos: Vector(1680, 1528) } },
-      { pickup: { pos: Vector(1500, 916) } },
-      { pickup: { pos: Vector(720, 768) } },
+      {
+        box: {
+          pos: Vector(263, 1580),
+          width: 200,
+          height: 876,
+          canBounce: true,
+        },
+      },
+      { shuriken: { pos: Vector(1992, 2340) } },
+      { shuriken: { pos: Vector(608, 1480) } },
+      { shuriken: { pos: Vector(612, 1036) } },
+      { pickup: { pos: Vector(1720, 564) } },
+      { pickup: { pos: Vector(1412, 2028) } },
       { pickup: { pos: Vector(608, 2404) } },
       {
         ropeContactPoint: {
-          pos: Vector(1276, 536),
-          canMove: true,
-          endPos: Vector(1276, 486),
+          pos: Vector(1792, 1204),
+          endPos: Vector(1792, 1204),
+        },
+      },
+      {
+        ropeContactPoint: { pos: Vector(1344, 796), endPos: Vector(1344, 796) },
+      },
+      {
+        ropeContactPoint: { pos: Vector(784, 1932), endPos: Vector(784, 1932) },
+      },
+      {
+        ropeContactPoint: {
+          pos: Vector(1991.4375, 1792),
+          endPos: Vector(1991.4375, 1792),
         },
       },
       {
         ropeContactPoint: {
-          pos: Vector(1916, 1148),
-          canMove: true,
-          endPos: Vector(1916, 2098),
+          pos: Vector(1343, 1524),
+          endPos: Vector(1343, 1524),
+        },
+      },
+      { box: { pos: Vector(200, 200), width: 200, height: 2600 } },
+      {
+        box: {
+          pos: Vector(2147, 1408),
+          width: 200,
+          height: 944,
+          canBounce: true,
         },
       },
       {
-        ropeContactPoint: {
-          pos: Vector(1812, 2004),
-        },
-      },
-      {
-        ropeContactPoint: {
-          pos: Vector(1028, 1540),
+        box: {
+          pos: Vector(915, 1160),
+          width: 200,
+          height: 200,
+          canBounce: true,
         },
       },
       { box: { pos: Vector(1831, 756), width: 420, height: 200 } },
       {
         box: {
-          pos: Vector(547, 1872),
+          pos: Vector(915, 1828),
           width: 200,
           height: 200,
           canBounce: true,
@@ -55,7 +79,7 @@ export default function getLevel() {
       },
       {
         box: {
-          pos: Vector(1136, 2240),
+          pos: Vector(1072, 2396),
           width: 724,
           height: 120,
           canBounce: true,

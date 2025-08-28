@@ -1,4 +1,4 @@
-import { Vector } from "kontra";
+import { Vector } from "./Vector";
 import { LevelObject } from "./types";
 
 export default function getLevel(): LevelObject {
@@ -28,9 +28,9 @@ export default function getLevel(): LevelObject {
       { box: { pos: Vector(1500 + 1100, -750), width: 200, height: 1100 } },
       { text: { pos: Vector(190, -400), text: "Tap and hold" } },
       { text: { pos: Vector(2315, 200), text: "Goal" } },
-      { ropeContactPoint: { pos: Vector(300, -500), radius: 40 } },
-      { ropeContactPoint: { pos: Vector(1000, -500), radius: 40 } },
-      { ropeContactPoint: { pos: Vector(1800, -500), radius: 40 } },
+      { ropeContactPoint: { pos: Vector(300, -500) } },
+      { ropeContactPoint: { pos: Vector(1000, -500) } },
+      { ropeContactPoint: { pos: Vector(1800, -500) } },
     ],
   };
 }

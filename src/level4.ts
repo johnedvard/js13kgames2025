@@ -1,4 +1,4 @@
-import { Vector } from "kontra";
+import { Vector } from "./Vector";
 import { LevelObject } from "./types";
 
 // Level 3 - Tower Climb
@@ -22,16 +22,16 @@ export default function getLevel(): LevelObject {
       { box: { pos: Vector(-1200, 400), width: 2800, height: 200 } }, // Floor
 
       // Rope connection points with more spacing
-      { ropeContactPoint: { pos: Vector(-300, -150), radius: 40 } }, // Bottom level
-      { ropeContactPoint: { pos: Vector(600, -150), radius: 40 } },
+      { ropeContactPoint: { pos: Vector(-300, -150) } }, // Bottom level
+      { ropeContactPoint: { pos: Vector(600, -150) } },
 
-      { ropeContactPoint: { pos: Vector(100, -600), radius: 40 } }, // Lower middle level
+      { ropeContactPoint: { pos: Vector(100, -600) } }, // Lower middle level
 
-      { ropeContactPoint: { pos: Vector(-300, -1050), radius: 40 } }, // Upper middle level
-      { ropeContactPoint: { pos: Vector(600, -1050), radius: 40 } },
+      { ropeContactPoint: { pos: Vector(-300, -1050) } }, // Upper middle level
+      { ropeContactPoint: { pos: Vector(600, -1050) } },
 
-      { ropeContactPoint: { pos: Vector(100, -1500), radius: 40 } }, // Top level
-      { ropeContactPoint: { pos: Vector(1000, -1500), radius: 40 } },
+      { ropeContactPoint: { pos: Vector(100, -1500) } }, // Top level
+      { ropeContactPoint: { pos: Vector(1000, -1500) } },
       { pickup: { pos: Vector(100, -200) } },
       { pickup: { pos: Vector(-500, -1500) } },
       { pickup: { pos: Vector(500, -900) } },

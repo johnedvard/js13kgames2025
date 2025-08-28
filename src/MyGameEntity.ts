@@ -1,9 +1,9 @@
-import { Vector } from "kontra";
 import { GameObjectType } from "./GameObjectType";
+import { MyVector } from "./Vector";
 
 export interface MyGameEntity {
   type: GameObjectType;
-  pos: Vector;
+  pos: MyVector;
   width?: number; // Optional for collision detection (rectangles)
   height?: number; // Optional for collision detection (rectangles)
   radius?: number; // Optional for collision detection (circles)

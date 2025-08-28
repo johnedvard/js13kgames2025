@@ -1,17 +1,17 @@
-import { Vector } from "kontra";
 import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
 import { colorWhite } from "./colorUtils";
+import { MyVector } from "./Vector";
 
 export class Goal implements MyGameEntity {
-  pos: Vector;
+  pos: MyVector;
   type = GameObjectType.Goal;
   width: number = 200;
   height: number = 150;
   private alpha: number = 1;
   private radiusX = 100;
   private radiusY = 150;
-  constructor(pos: Vector) {
+  constructor(pos: MyVector) {
     this.pos = pos;
   }
 

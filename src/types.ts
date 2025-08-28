@@ -22,7 +22,8 @@ export type TextProp = {
 
 export type RopeContactPointProp = {
   pos: { x: number; y: number };
-  radius: number;
+  endPos?: { x: number; y: number };
+  isActive?: boolean;
 };
 
 export type MyGameObject = {

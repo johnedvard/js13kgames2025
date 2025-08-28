@@ -1,4 +1,4 @@
-import { Vector } from "kontra";
+import { Vector } from "./Vector";
 
 import { Camera } from "./Camera";
 import { Goal } from "./Goal";
@@ -22,6 +22,7 @@ import level7 from "./level7";
 import level8 from "./level8";
 import level9 from "./level9";
 import level10 from "./level10";
+import level11 from "./level11";
 
 // Keep an odd number of levels to make it work.
 export const levels: Array<() => LevelObject> = [
@@ -35,6 +36,7 @@ export const levels: Array<() => LevelObject> = [
   level8,
   level9,
   level10,
+  level11,
   levelFinal,
 ];
 
@@ -47,9 +49,9 @@ export function initLevel(camera: Camera, levelId = 1) {
 
   let level = levels[levelId - 1]();
 
-  const player = new Player(Vector(level.playerPos));
-  const goal = new Goal(Vector(level.goalPos));
-  camera.setPosition(player.pos);
+  const player = new Player(Vector(level.playerPos.x, level.playerPos.y));
+  const goal = new Goal(Vector(level.goalPos.x, level.goalPos.y));
+  camera.pos = Vector(player.pos.x, player.pos.y);
 
   level.objects.forEach((object: any) => {
     if (object.box) {
@@ -67,8 +69,6 @@ export function initLevel(camera: Camera, levelId = 1) {
           object.ropeContactPoint.pos,
           object.ropeContactPoint.isActive,
           object.ropeContactPoint.canActivate,
-          object.ropeContactPoint.canMove,
-          object.ropeContactPoint.startPoint,
           object.ropeContactPoint.endPos
         )
       );
@@ -78,7 +78,7 @@ export function initLevel(camera: Camera, levelId = 1) {
       gameObjects.push(new Shuriken(object.shuriken.pos));
     } else if (object.text) {
       const text = new MyText(
-        Vector(object.text.pos),
+        Vector(object.text.pos.x, object.text.pos.y),
         object.text.text,
         colorBlack
       );

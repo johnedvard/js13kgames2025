@@ -1,7 +1,8 @@
-import { lerp, Vector } from "kontra";
+import { lerp } from "kontra";
 import { colorBlack } from "./colorUtils";
+import { Vector } from "./Vector";
 
-enum TransitionState {
+const enum TransitionState {
   FadeIn = "i",
   FadeOut = "o",
   Complete = "c",

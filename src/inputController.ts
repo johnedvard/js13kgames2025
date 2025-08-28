@@ -1,7 +1,8 @@
-import { Vector, emit } from "kontra";
+import { emit } from "kontra";
 import { GameEvent } from "./GameEvent";
 // import { playBackgroundMusic } from "./myAudio";
 import { playSong } from "./audio";
+import { Vector } from "./Vector";
 
 let isTouching = false;
 let isDragging = false;
@@ -27,23 +28,6 @@ export function initializeInputController(canvas: HTMLCanvasElement) {
   // Keyboard events
   document.addEventListener("keydown", onKeyDown);
   document.addEventListener("keyup", onKeyUp);
-}
-
-export function cleanupInputController() {
-  // Mouse events
-  _canvas.removeEventListener("mousedown", onMouseDown);
-  _canvas.removeEventListener("mouseup", onMouseUp);
-  _canvas.removeEventListener("mousemove", onMouseMove);
-  _canvas.removeEventListener("wheel", onWheel);
-
-  // Touch events
-  _canvas.removeEventListener("touchstart", onTouchStart);
-  _canvas.removeEventListener("touchend", onTouchEnd);
-  _canvas.removeEventListener("touchmove", onTouchMove);
-
-  // Keyboard events
-  document.removeEventListener("keydown", onKeyDown);
-  document.removeEventListener("keyup", onKeyUp);
 }
 
 function onMouseDown(e: MouseEvent) {

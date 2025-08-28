@@ -1,4 +1,4 @@
-import { Vector } from "kontra";
+import { Vector } from "./Vector";
 
 export default function getLevel() {
   return {
@@ -21,14 +21,14 @@ export default function getLevel() {
       { pickup: { pos: Vector(2260, 944) } },
       { pickup: { pos: Vector(2416, 2288) } },
       { pickup: { pos: Vector(1204, 1408) } },
-      { ropeContactPoint: { pos: Vector(1204, 1004), radius: 40 } },
-      { ropeContactPoint: { pos: Vector(3220, 1004), radius: 40 } },
-      { ropeContactPoint: { pos: Vector(1812, 2212), radius: 40 } },
-      { ropeContactPoint: { pos: Vector(3624, 2216), radius: 40 } },
+      { ropeContactPoint: { pos: Vector(1204, 1004) } },
+      { ropeContactPoint: { pos: Vector(3220, 1004) } },
+      { ropeContactPoint: { pos: Vector(1812, 2212) } },
+      { ropeContactPoint: { pos: Vector(3624, 2216) } },
       { box: { pos: Vector(3764, 1460), width: 200, height: 200 } },
       { box: { pos: Vector(300, 200), width: 4300, height: 200 } },
       { box: { pos: Vector(760, 1868), width: 200, height: 200 } },
-      { ropeContactPoint: { pos: Vector(2308, 592), radius: 40 } },
+      { ropeContactPoint: { pos: Vector(2308, 592) } },
       { box: { pos: Vector(300, 400), width: 200, height: 2600 } },
       { box: { pos: Vector(300, 2800), width: 4200, height: 200 } },
       { box: { pos: Vector(4400, 200), width: 200, height: 2800 } },

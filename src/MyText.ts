@@ -1,15 +1,15 @@
-import { Vector } from "kontra";
+import { MyVector } from "./Vector";
 import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
 import { colorWhite, fontFamily } from "./colorUtils";
 
 export class MyText implements MyGameEntity {
-  pos: Vector;
+  pos: MyVector;
   type = GameObjectType.Text;
   text: string;
   color: string;
 
-  constructor(pos: Vector, text: string, color: string = colorWhite) {
+  constructor(pos: MyVector, text: string, color: string = colorWhite) {
     this.pos = pos;
     this.text = text;
     this.color = color;

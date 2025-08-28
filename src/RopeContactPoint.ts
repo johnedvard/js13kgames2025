@@ -1,4 +1,4 @@
-import { Vector, lerp } from "kontra";
+import { lerp } from "kontra";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
 import {
@@ -9,41 +9,43 @@ import {
   colorAccent,
 } from "./colorUtils";
 import { smoothstep } from "./mathUtils";
+import { MyVector, Vector } from "./Vector";
 
 export class RopeContactPoint implements MyGameEntity {
-  pos: Vector;
+  pos: MyVector;
   radius: number = 40;
   rotation: number = 0;
   type = GameObjectType.RopeContactPoint;
   isHighlighted: boolean = false;
   isActive: boolean = true; // ON/OFF state
   canActivate: boolean = true; // Activation state
-  activationTime = 3000;
+  activationTime = 3;
   timeSinceActivated = 0;
   // Movement properties
   canMove: boolean = false;
-  startPoint: Vector;
-  endPos: Vector;
+  startPos: MyVector;
+  endPos: MyVector;
   moveTime: number = 2000; // ms to move from start to end
   moveElapsed: number = 0;
   moveDirection: number = 1; // 1: start to end, -1: end to start
 
   constructor(
-    pos: Vector,
+    pos: MyVector,
     isActive: boolean = true,
     canActivate: boolean = false,
-    canMove: boolean = false,
-    startPoint: Vector,
-    endPos: Vector,
+    endPos: MyVector,
     moveTime: number = 2000
   ) {
     this.pos = pos;
     this.isActive = isActive;
     this.canActivate = canActivate;
-    this.canMove = canMove;
-    this.startPoint = startPoint || pos;
+    this.startPos = pos;
     this.endPos = endPos || pos;
     this.moveTime = moveTime;
+    if (endPos?.x && this.startPos?.x) {
+      this.canMove =
+        endPos.x !== this.startPos.x || endPos.y !== this.startPos.y;
+    }
   }
 
   update() {
@@ -56,8 +58,8 @@ export class RopeContactPoint implements MyGameEntity {
       let easeT = this.moveDirection === 1 ? t : 1 - t;
       easeT = smoothstep(easeT);
       this.pos = Vector(
-        lerp(this.startPoint.x, this.endPos.x, easeT),
-        lerp(this.startPoint.y, this.endPos.y, easeT)
+        lerp(this.startPos.x, this.endPos.x, easeT),
+        lerp(this.startPos.y, this.endPos.y, easeT)
       );
       if (t >= 1) {
         t = 1;
@@ -68,7 +70,7 @@ export class RopeContactPoint implements MyGameEntity {
 
     // Handle automatic activation/deactivation if canActivate is true
     if (this.canActivate) {
-      this.timeSinceActivated += 16.67; // Assuming 60 FPS, so ~16.67ms per frame
+      this.timeSinceActivated += 0.02;
       if (this.timeSinceActivated >= this.activationTime) {
         this.toggleActive();
         this.timeSinceActivated = 0; // Reset the timer
@@ -84,7 +86,7 @@ export class RopeContactPoint implements MyGameEntity {
       context.lineWidth = 12;
       context.setLineDash([8, 8]);
       context.beginPath();
-      context.moveTo(this.startPoint.x, this.startPoint.y);
+      context.moveTo(this.startPos.x, this.startPos.y);
       context.lineTo(this.endPos.x, this.endPos.y);
       context.stroke();
       context.setLineDash([]);
@@ -103,7 +105,7 @@ export class RopeContactPoint implements MyGameEntity {
     }
 
     // Choose color based on active state
-    const strokeColor = this.isActive ? "#6E2639" : colorGray; // Same color as Box when active, gray when inactive
+    const strokeColor = this.isActive ? colorAccent : colorGray; // Same color as Box when active, gray when inactive
     context.strokeStyle = strokeColor;
     context.lineWidth = 5;
 

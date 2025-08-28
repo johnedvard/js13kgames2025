@@ -1,4 +1,4 @@
-import { off, on, Vector } from "kontra";
+import { off, on } from "kontra";
 import { GameEvent } from "./GameEvent";
 import { findClosestRopeContactPoint } from "./main";
 import { RopeContactPoint } from "./RopeContactPoint";
@@ -6,19 +6,21 @@ import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
 import { colorAccent, colorBlack, colorWhite } from "./colorUtils";
 import { playRopeExtend } from "./audio";
+import { easeOutCubic } from "./mathUtils";
+import { MyVector, Vector } from "./Vector";
 export type PlayerState = "d" | "a";
 
 // Verlet point for headband threads
 interface VerletPoint {
-  pos: Vector;
-  oldPos: Vector;
+  pos: MyVector;
+  oldPos: MyVector;
   pinned: boolean; // First point is pinned to headband
 }
 
 export class Player implements MyGameEntity {
   rot = 0;
-  pos: Vector = Vector(0, 0); // Center point of the balloon
-  velocity: Vector = Vector(0, 0); // Player velocity
+  pos = Vector(0, 0); // Center point of the balloon
+  velocity = Vector(0, 0); // Player velocity
   state: PlayerState = "a"; // dead alive
   type = GameObjectType.Player;
 
@@ -57,7 +59,7 @@ export class Player implements MyGameEntity {
   maxSpeed = 25;
   startPos = Vector(0, 0);
 
-  constructor(startPos: Vector) {
+  constructor(startPos: MyVector) {
     this.startPos = startPos;
     this.pos = startPos;
     this.initializeCatBodyCache();
@@ -253,27 +255,17 @@ export class Player implements MyGameEntity {
     // Reset tween progress
     this.ropeTweenProgress = 0;
 
-    // Give the player speed boost towards the grapple point only if current speed is low
-    const currentSpeed = this.velocity.length();
-    const speedThreshold = 8; // Only boost if speed is below this threshold
+    // Calculate boost amount based on how slow the player is moving
+    const actualBoostSpeed = 9;
 
-    if (currentSpeed < speedThreshold) {
-      // Calculate boost amount based on how slow the player is moving
-      const speedDeficit = speedThreshold - currentSpeed;
-      const boostMultiplier = speedDeficit / speedThreshold; // 0 to 1, higher when slower
-      const baseBoostSpeed = 9; // Base speed boost amount
-      const actualBoostSpeed = baseBoostSpeed * boostMultiplier;
+    // Determine horizontal direction to the grapple point
+    const deltaToGrapple = closestRopeContactPoint.pos.subtract(ropeAttachPos);
 
-      // Determine horizontal direction to the grapple point
-      const deltaToGrapple =
-        closestRopeContactPoint.pos.subtract(ropeAttachPos);
-
-      // Add velocity only in horizontal direction (+x or -x)
-      const horizontalDirection = Math.sign(deltaToGrapple.x); // -1 for left, +1 for right
-      this.velocity = this.velocity.add(
-        Vector(horizontalDirection * actualBoostSpeed, 0)
-      );
-    }
+    // Add velocity only in horizontal direction (+x or -x)
+    const horizontalDirection = Math.sign(deltaToGrapple.x); // -1 for left, +1 for right
+    this.velocity = this.velocity.add(
+      Vector(horizontalDirection * actualBoostSpeed, 0)
+    );
   };
 
   getDirection() {
@@ -297,12 +289,6 @@ export class Player implements MyGameEntity {
     // Release the rope
     this.isGrappling = false;
     this.ropeContactPoint = null;
-    this.ropeLength = 0;
-    this.targetRopeLength = 0;
-    this.initialRopeLength = 0;
-    this.ropeTweenProgress = 0;
-    this.ropeShootProgress = 0;
-    this.fullRopeDistance = 0;
   };
   setState(state: PlayerState) {
     this.state = state;
@@ -349,8 +335,6 @@ export class Player implements MyGameEntity {
     context: CanvasRenderingContext2D,
     thread: VerletPoint[]
   ) {
-    if (thread.length < 2) return;
-
     context.save();
 
     // Render thread shadow first
@@ -375,8 +359,6 @@ export class Player implements MyGameEntity {
     offsetX: number,
     offsetY: number
   ) {
-    if (thread.length < 2) return;
-
     context.beginPath();
     context.moveTo(thread[0].pos.x + offsetX, thread[0].pos.y + offsetY);
 
@@ -416,12 +398,12 @@ export class Player implements MyGameEntity {
   }
 
   // Helper method to get the center position of the cat body
-  private getCenterPosition(): Vector {
+  private getCenterPosition() {
     return Vector(this.pos.x + this.catCenterX, this.pos.y + this.catCenterY);
   }
 
   // Helper method to get the rope attachment position (bottom of the cat)
-  private getRopeAttachmentPosition(): Vector {
+  private getRopeAttachmentPosition() {
     return Vector(
       this.pos.x + this.catCenterX,
       this.pos.y + this.catCenterY + 40
@@ -431,7 +413,6 @@ export class Player implements MyGameEntity {
   // Update headband threads using Verlet integration
   private updateHeadbandThreads() {
     const gravity = Vector(0, 0.2); // Gravity for threads
-    const damping = 0.995; // Air resistance
 
     // Calculate rotated anchor points
     const catCenter = this.getCenterPosition();
@@ -459,8 +440,7 @@ export class Player implements MyGameEntity {
         catCenter.x + rotatedLeftOffset.x,
         catCenter.y + rotatedLeftOffset.y
       ),
-      gravity,
-      damping
+      gravity
     );
 
     // Update right thread with rotated anchor position
@@ -470,16 +450,14 @@ export class Player implements MyGameEntity {
         catCenter.x + rotatedRightOffset.x,
         catCenter.y + rotatedRightOffset.y
       ),
-      gravity,
-      damping
+      gravity
     );
   }
 
   private updateThread(
     thread: VerletPoint[],
-    anchorPos: Vector,
-    gravity: Vector,
-    damping: number
+    anchorPos: MyVector,
+    gravity: MyVector
   ) {
     // Update positions using Verlet integration
     for (let i = 0; i < thread.length; i++) {
@@ -491,7 +469,7 @@ export class Player implements MyGameEntity {
         point.oldPos = point.pos;
       } else {
         // Apply Verlet integration
-        const velocity = point.pos.subtract(point.oldPos).scale(damping);
+        const velocity = point.pos.subtract(point.oldPos);
         point.oldPos = point.pos;
         point.pos = point.pos.add(velocity).add(gravity);
       }
@@ -523,11 +501,6 @@ export class Player implements MyGameEntity {
     }
   }
 
-  // Easing function for smooth rope shortening (ease-out cubic)
-  private easeOutCubic(t: number): number {
-    return 1 - Math.pow(1 - t, 3);
-  }
-
   private renderRope(context: CanvasRenderingContext2D) {
     if (!this.ropeContactPoint) return;
 
@@ -536,7 +509,7 @@ export class Player implements MyGameEntity {
     // Animate rope shooting to target with easing (fast start, slow end)
     const targetX = this.ropeContactPoint.pos.x;
     const targetY = this.ropeContactPoint.pos.y;
-    const easedProgress = this.easeOutCubic(this.ropeShootProgress);
+    const easedProgress = easeOutCubic(this.ropeShootProgress);
     const currentX =
       ropeAttachPos.x + (targetX - ropeAttachPos.x) * easedProgress;
     const currentY =
@@ -645,7 +618,7 @@ export class Player implements MyGameEntity {
       this.ropeTweenProgress = Math.min(1, this.ropeTweenProgress);
 
       // Apply easing function to create smooth rope shortening
-      const easedProgress = this.easeOutCubic(this.ropeTweenProgress);
+      const easedProgress = easeOutCubic(this.ropeTweenProgress);
       this.ropeLength =
         this.initialRopeLength +
         (this.targetRopeLength - this.initialRopeLength) * easedProgress;

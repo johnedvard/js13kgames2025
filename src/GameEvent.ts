@@ -1,4 +1,4 @@
-export enum GameEvent {
+export const enum GameEvent {
   up = "u",
   down = "d",
   play = "p",

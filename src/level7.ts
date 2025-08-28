@@ -1,4 +1,4 @@
-import { Vector } from "kontra";
+import { Vector } from "./Vector";
 
 export default function getLevel() {
   return {
@@ -26,7 +26,7 @@ export default function getLevel() {
       { shuriken: { pos: Vector(3412, 2488) } },
       { shuriken: { pos: Vector(3632, 2480) } },
       { shuriken: { pos: Vector(3864, 2484) } },
-      { ropeContactPoint: { pos: Vector(1076, 1720), radius: 40 } },
+      { ropeContactPoint: { pos: Vector(1076, 1720) } },
       { shuriken: { pos: Vector(1280, 2660) } },
       { shuriken: { pos: Vector(1564, 2656) } },
       { shuriken: { pos: Vector(3772, 2656) } },
@@ -44,7 +44,7 @@ export default function getLevel() {
       { pickup: { pos: Vector(1304, 2008) } },
       { pickup: { pos: Vector(2480, 1576) } },
       { pickup: { pos: Vector(4092, 1324) } },
-      { ropeContactPoint: { pos: Vector(3648, 1700), radius: 40 } },
+      { ropeContactPoint: { pos: Vector(3648, 1700) } },
       { box: { pos: Vector(200, 100), width: 4300, height: 200 } },
       { box: { pos: Vector(4400, 100), width: 200, height: 2900 } },
       { box: { pos: Vector(0, 2300), width: 900, height: 700 } },
