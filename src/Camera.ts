@@ -7,10 +7,6 @@ export class Camera {
   canvas: HTMLCanvasElement;
   lerpFactor: number = 0.04; // Adjust this value to control the lerp speed
 
-  // Smoothed offset direction for camera following
-  smoothedOffsetDirection: MyVector = Vector(1, 0); // Start with default direction
-  offsetLerpFactor: number = 0.04; // Slower lerp for offset direction changes
-
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.pos = Vector(canvas.width, canvas.height);

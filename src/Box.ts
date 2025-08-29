@@ -31,9 +31,8 @@ export class Box implements MyGameEntity {
     // Animate stroke width back to minimum
     if (this.strokeWidth > this.minStrokeWidth) {
       this.strokeWidth *= this.bounceDecay;
-      if (this.strokeWidth <= this.minStrokeWidth) {
-        this.strokeWidth = this.minStrokeWidth;
-      }
+    } else {
+      this.strokeWidth = this.minStrokeWidth;
     }
   }
 

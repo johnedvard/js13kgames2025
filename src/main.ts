@@ -13,7 +13,12 @@ import { MyGameEntity } from "./MyGameEntity";
 import { handleOtherCollisions, handlePlayerCollisions } from "./gameUtils";
 import { RopeContactPoint } from "./RopeContactPoint";
 import { Ball } from "./Ball";
-import { colorAccent, colorBlack, colorGray, colorWhite } from "./colorUtils";
+import {
+  colorAccent,
+  colorBlack,
+  colorLightGray,
+  colorWhite,
+} from "./colorUtils";
 import { MainMenu } from "./MainMenu";
 import { playDead, playGoal } from "./audio";
 import { MyVector, Vector } from "./Vector";
@@ -117,7 +122,7 @@ function highlightClosestRopeContactPoint() {
 
   const closestRopeContactPoint = findClosestRopeContactPoint(_player.pos);
   if (!closestRopeContactPoint) return;
-  if (_closestRopeContactPoint != closestRopeContactPoint) {
+  if (_closestRopeContactPoint !== closestRopeContactPoint) {
     _closestRopeContactPoint?.setHighlight(false);
     closestRopeContactPoint.setHighlight(true);
     _closestRopeContactPoint = closestRopeContactPoint;
@@ -129,13 +134,12 @@ const mainLoop = GameLoop({
   update: function () {
     if (activeScene == SceneId.Menu) {
       mainMenu.update();
-      //   camera?.follow(currentCanvasPos);
       selectLevelObjects.forEach((object: any) => object.update());
     } else {
       _objects.forEach((object) => object.update());
       levelPersistentObjects.forEach((object) => object.update());
       camera?.follow(_player);
-      // consider not adding levelpersitent objects to the collision detection
+      // consider not adding levelPersistentObjects to the collision detection
       handlePlayerCollisions(_player, [..._objects, ...levelPersistentObjects]);
       handleOtherCollisions([..._objects, ...levelPersistentObjects]);
       highlightClosestRopeContactPoint();
@@ -167,16 +171,7 @@ function renderBackgrounds(context: CanvasRenderingContext2D) {
 
     // Create a vertical gradient - we'll use the bounding box of the polygon
     const positions = levelBackground.positions;
-    const minY = Math.min(...positions.map((p: any) => p.y));
-    const maxY = Math.max(...positions.map((p: any) => p.y));
-    const minX = Math.min(...positions.map((p: any) => p.x));
-
-    const gradient = context.createLinearGradient(minX, minY, minX, maxY);
-    gradient.addColorStop(0, "#ddd"); // lightgray
-    gradient.addColorStop(1, colorGray); // darkgray
-
-    context.fillStyle = gradient;
-
+    context.fillStyle = colorLightGray;
     // Draw the polygon using the positions array
     context.beginPath();
     context.moveTo(positions[0].x, positions[0].y);
@@ -241,8 +236,7 @@ async function startLevel(scene: SceneId = SceneId.Level, levelId: number) {
     camera,
     currentLevelId
   );
-  // const seaWeed = new SeaWeed(Vector(player.centerPoint));
-  // particles.push(seaWeed);
+
   _objects.length = 0;
   _player?.destroy();
   _player = player;
@@ -251,8 +245,6 @@ async function startLevel(scene: SceneId = SceneId.Level, levelId: number) {
   levelBackground = background; // Store the background
   _objects.splice(0, 0, _player);
   _objects.splice(0, 0, _goal);
-
-  // todo cleanup existing objects
 
   gameHasStarted = true;
 
@@ -315,8 +307,6 @@ function handleLevelClear() {
 
   currentLevelId++;
 
-  // _objects.length = 0;
-  // mainLoop.stop();
   sceneTransition.reset();
   transitionLoop.start();
 }
@@ -327,7 +317,7 @@ export function findClosestRopeContactPoint(
   let closestDistance = Infinity;
 
   _objects.forEach((object) => {
-    if (object.type != GameObjectType.RopeContactPoint) return;
+    if (object.type !== GameObjectType.RopeContactPoint) return;
     if (!(object as RopeContactPoint).isActive) return;
     const distance = object.pos.distance(pos);
     if (distance < closestDistance) {

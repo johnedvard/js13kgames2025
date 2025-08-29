@@ -546,15 +546,6 @@ export class MainMenu implements MyGameEntity {
         this.shakeTimer = 0;
       }
     }
-
-    // Update press animation is now handled by mouse events, no timer needed
-
-    // Update all pickup instances
-    // this.buttonPickups.forEach((pickups) => {
-    //   pickups.forEach((p) => {
-    //     p.update();
-    //   });
-    // });
   }
 
   // Method to refresh the button rendering (call this when completion data changes)
