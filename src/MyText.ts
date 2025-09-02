@@ -20,7 +20,7 @@ export class MyText implements MyGameEntity {
   render(ctx: CanvasRenderingContext2D) {
     ctx.save();
     ctx.fillStyle = this.color;
-    ctx.font = `42px ${fontFamily}`;
+    ctx.font = `62px ${fontFamily}`;
     ctx.fillText(this.text, this.pos.x, this.pos.y);
     ctx.restore();
   }

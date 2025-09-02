@@ -2,60 +2,79 @@ import { Vector } from "./Vector";
 
 export default function getLevel() {
   return {
-    playerPos: Vector(512, 964),
-    goalPos: Vector(0, -99999),
+    playerPos: Vector(1540, 1984),
+    goalPos: Vector(-9999, -9999),
     background: {
       positions: [
-        Vector(264, 480),
-        Vector(1832, 484),
-        Vector(3332, 512),
-        Vector(3352, 2356),
-        Vector(296, 2356),
-        Vector(276, 1060),
+        Vector(100, 100),
+        Vector(4680, 136),
+        Vector(4688, 3076),
+        Vector(120, 3088),
       ],
     },
     objects: [
+      { box: { pos: Vector(50, 0), width: 4550, height: 200 } },
+      { box: { pos: Vector(4600, 0), width: 200, height: 3000 } },
+      { box: { pos: Vector(50, 200), width: 200, height: 2800 } },
       {
-        ropeContactPoint: {
-          pos: Vector(1012, 1004),
-          canActivate: true,
+        box: {
+          pos: Vector(724, 2600),
+          width: 2200,
+          height: 400,
+          canBounce: true,
+        },
+      },
+      { box: { pos: Vector(50, 3000), width: 4750, height: 200 } },
+      { shuriken: { pos: Vector(1808, 1200) } },
+      {
+        box: {
+          pos: Vector(3136, 920),
+          width: 200,
+          height: 200,
+          canBounce: true,
         },
       },
       {
+        ropeContactPoint: { pos: Vector(1016, 604), endPos: Vector(1016, 604) },
+      },
+      {
         ropeContactPoint: {
-          pos: Vector(1628, 1204),
+          pos: Vector(2588, 1812),
+          endPos: Vector(2588, 1812),
+        },
+      },
+      {
+        ropeContactPoint: { pos: Vector(2764, 944), endPos: Vector(2764, 944) },
+      },
+      {
+        ropeContactPoint: { pos: Vector(2164, 456), endPos: Vector(2164, 456) },
+      },
+      {
+        ropeContactPoint: { pos: Vector(716, 1644), endPos: Vector(716, 1644) },
+      },
+      {
+        ropeContactPoint: {
           canActivate: true,
           isActive: false,
+          pos: Vector(3832, 2196),
+          endPos: Vector(3832, 2196),
+        },
+      },
+      {
+        box: {
+          pos: Vector(3752, 2532),
+          width: 200,
+          height: 200,
+          canBounce: true,
         },
       },
       {
         ropeContactPoint: {
-          pos: Vector(2208, 1388),
-          canActivate: true,
+          pos: Vector(3984, 1228),
+          endPos: Vector(2984, 1228),
         },
       },
-      {
-        ropeContactPoint: {
-          pos: Vector(2812, 1404),
-          canActivate: true,
-          isActive: false,
-        },
-      },
-      { text: { pos: Vector(2004, 1000), text: "Thanks for playing!" } },
-      { shuriken: { pos: Vector(1600, 2084) } },
-      { shuriken: { pos: Vector(2200, 2084) } },
-      { shuriken: { pos: Vector(2804, 2076) } },
-      { pickup: { pos: Vector(1352, 1244) } },
-      { pickup: { pos: Vector(1992, 1580) } },
-      { pickup: { pos: Vector(2584, 1660) } },
-      { shuriken: { pos: Vector(1000, 2080) } },
-      { box: { pos: Vector(296, 2200), width: 3000, height: 200 } },
-      { box: { pos: Vector(200, 400), width: 200, height: 1600 } },
-      { box: { pos: Vector(3200, 400), width: 200, height: 2000 } },
-      { box: { pos: Vector(200, 1100), width: 400, height: 1300 } },
-      { box: { pos: Vector(200, 1400), width: 600, height: 1000 } },
-      { box: { pos: Vector(400, 400), width: 3000, height: 200 } },
-      { box: { pos: Vector(2950, 2000), width: 450, height: 400 } },
+      { text: { pos: Vector(1500, 2000), text: "Thanks for playing!" } }, // centered for wider level
     ],
   };
 }
