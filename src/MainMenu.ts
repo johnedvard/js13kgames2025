@@ -56,13 +56,6 @@ export class MainMenu implements MyGameEntity {
   // Pickup instances for pickups in buttons
   private buttonPickups: Pickup[][] = [];
 
-  // Shake animation properties
-  private shakeButtonId: number | null = null;
-  private shakeTimer = 0;
-  private shakeDuration = 0.5; // Total shake duration in seconds
-  private shakeIntensity = 5; // Rotation intensity in degrees
-  private shakeFrequency = 20; // Shake frequency
-
   // Button press animation properties
   private pressedLevelButton: number | null = null;
   private pressedScrollButton: "u" | "d" | null = null;
@@ -422,8 +415,6 @@ export class MainMenu implements MyGameEntity {
       } else {
         // Play disabled button sound
         playButtonDisable();
-        // Start shake animation for the disabled button
-        this.startShakeAnimation(clickedLevel);
         return false;
       }
     }
@@ -491,11 +482,6 @@ export class MainMenu implements MyGameEntity {
     return null;
   }
 
-  private startShakeAnimation(levelId: number) {
-    this.shakeButtonId = levelId;
-    this.shakeTimer = 0;
-  }
-
   private startPress(type: "l" | "s", id: number | "u" | "d") {
     this.isMouseDown = true;
     if (type == "l") {
@@ -515,20 +501,6 @@ export class MainMenu implements MyGameEntity {
     this.renderAllButtonsToOffscreen();
   }
 
-  private getShakeRotation(): number {
-    if (this.shakeButtonId == null || this.shakeTimer >= this.shakeDuration) {
-      return 0;
-    }
-
-    // Create oscillating rotation that decreases over time
-    const progress = this.shakeTimer / this.shakeDuration;
-    const decay = 1 - progress; // Decay over time
-    const oscillation = Math.sin(
-      this.shakeTimer * this.shakeFrequency * Math.PI
-    );
-    return oscillation * this.shakeIntensity * decay * (Math.PI / 180); // Convert to radians
-  }
-
   update() {
     // Smooth scrolling interpolation
     const scrollDiff = this.targetScrollOffset - this.scrollOffset;
@@ -536,15 +508,6 @@ export class MainMenu implements MyGameEntity {
       this.scrollOffset += scrollDiff * this.scrollSpeed;
     } else {
       this.scrollOffset = this.targetScrollOffset;
-    }
-
-    // Update shake animation
-    if (this.shakeButtonId != null) {
-      this.shakeTimer += 1 / 60; // Assuming 60 FPS
-      if (this.shakeTimer >= this.shakeDuration) {
-        this.shakeButtonId = null;
-        this.shakeTimer = 0;
-      }
     }
   }
 
@@ -661,97 +624,21 @@ export class MainMenu implements MyGameEntity {
     ctx.clip();
 
     // If there's a shaking button, we need to draw it separately with rotation
-    if (this.shakeButtonId != null) {
-      // Draw the offscreen canvas but exclude the shaking button area
-      ctx.drawImage(
-        this.offscreenCanvas,
-        0, // Source x
-        this.scrollOffset, // Source y (scroll offset)
-        listWidth + shadowOffset, // Source width - include shadow space
-        this.scrollAreaHeight, // Source height
-        scrollAreaLeft, // Destination x
-        this.scrollAreaTop, // Destination y
-        listWidth + shadowOffset, // Destination width - include shadow space
-        this.scrollAreaHeight // Destination height
-      );
 
-      // Draw the shaking button with rotation
-      this.drawShakingButton(ctx, scrollAreaLeft, listWidth);
-    } else {
-      // Normal drawing when no button is shaking
-      ctx.drawImage(
-        this.offscreenCanvas,
-        0, // Source x
-        this.scrollOffset, // Source y (scroll offset)
-        listWidth + shadowOffset, // Source width - include shadow space
-        this.scrollAreaHeight, // Source height
-        scrollAreaLeft, // Destination x
-        this.scrollAreaTop, // Destination y
-        listWidth + shadowOffset, // Destination width - include shadow space
-        this.scrollAreaHeight // Destination height
-      );
-    }
+    // Normal drawing when no button is shaking
+    ctx.drawImage(
+      this.offscreenCanvas,
+      0, // Source x
+      this.scrollOffset, // Source y (scroll offset)
+      listWidth + shadowOffset, // Source width - include shadow space
+      this.scrollAreaHeight, // Source height
+      scrollAreaLeft, // Destination x
+      this.scrollAreaTop, // Destination y
+      listWidth + shadowOffset, // Destination width - include shadow space
+      this.scrollAreaHeight // Destination height
+    );
 
     ctx.restore();
-  }
-
-  private drawShakingButton(
-    ctx: CanvasRenderingContext2D,
-    scrollAreaLeft: number,
-    listWidth: number
-  ) {
-    if (this.shakeButtonId == null) return;
-
-    const levelId = this.shakeButtonId;
-    const buttonIndex = levelId - 1; // Convert to 0-based index
-    const buttonY = buttonIndex * (this.buttonHeight + this.buttonSpacing);
-    const screenY = buttonY - this.scrollOffset + this.scrollAreaTop;
-
-    // Only draw if the button is visible in the scroll area
-    if (this.isVisibleInScrollArea(screenY)) {
-      const shadowOffset = 12;
-      const rotation = this.getShakeRotation();
-
-      // Get button data
-      const completionData = getItem<string>(`c-${levelId}`);
-      const hasBeenPlayed = !!completionData;
-      const isPlayable = this.isLevelPlayable(levelId);
-
-      // Save context for rotation
-      ctx.save();
-
-      // Translate to button center for rotation
-      const buttonCenterX = scrollAreaLeft + listWidth / 2;
-      const buttonCenterY = screenY + this.buttonHeight / 2;
-      ctx.translate(buttonCenterX, buttonCenterY);
-      ctx.rotate(rotation);
-
-      // Draw button from center (translate coordinates)
-      const rectX = -listWidth / 2;
-      const rectY = -this.buttonHeight / 2;
-
-      // Draw shadow first
-      ctx.fillStyle = colorBlack;
-      ctx.fillRect(
-        rectX + shadowOffset,
-        rectY + shadowOffset,
-        listWidth,
-        this.buttonHeight
-      );
-
-      // Draw level rectangle
-      ctx.fillStyle = hasBeenPlayed || isPlayable ? colorWhite : colorDarkGray;
-      ctx.fillRect(rectX, rectY, listWidth, this.buttonHeight);
-
-      // Draw level text
-      ctx.fillStyle = colorAccent;
-      ctx.font = `${Math.min(this.buttonHeight * 0.6, 48)}px ${fontFamily}`;
-
-      const levelText = levelId.toString().padStart(3, "0");
-      ctx.fillText(levelText, rectX + 20, rectY + this.buttonHeight / 2);
-
-      ctx.restore();
-    }
   }
 
   private drawTitle(ctx: CanvasRenderingContext2D) {

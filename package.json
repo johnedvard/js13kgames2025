@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:poki": "npm run build -- --mode=poki",
     "build:roadroller": "npm run build && npx roadroller dist/index.js -o dist/index.js",
     "preview": "vite preview"
   },

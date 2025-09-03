@@ -337,5 +337,9 @@ function startMenu() {
   mainLoop.start();
   gameHasStarted = true;
 }
-
 startMenu();
+// if (import.meta.env.MODE !== "poki") {
+// } else {
+//   // Start the game directly without the menu
+//   startLevel(SceneId.Level, currentLevelId);
+// }

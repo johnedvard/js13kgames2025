@@ -26,7 +26,7 @@ export default function getLevel(): LevelObject {
       { box: { pos: Vector(-500, 150), width: 1100 * 3, height: 200 } },
       // right wall
       { box: { pos: Vector(1500 + 1100, -750), width: 200, height: 1100 } },
-      { text: { pos: Vector(150, -370), text: "Tap and hold" } },
+      { text: { pos: Vector(0, -200), text: "Tap and hold anywhere" } },
       { text: { pos: Vector(2315, 230), text: "Goal" } },
       { ropeContactPoint: { pos: Vector(300, -500) } },
       { ropeContactPoint: { pos: Vector(1000, -500) } },
