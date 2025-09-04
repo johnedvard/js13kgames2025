@@ -187,8 +187,4 @@ export class RopeContactPoint implements MyGameEntity {
   toggleActive() {
     this.isActive = !this.isActive;
   }
-
-  getActive(): boolean {
-    return this.isActive;
-  }
 }

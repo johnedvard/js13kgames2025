@@ -268,10 +268,6 @@ export class Player implements MyGameEntity {
     );
   };
 
-  getDirection() {
-    return this.velocity.normalize();
-  }
-
   onStopGrapple = () => {
     // Calculate spin velocity based on current movement speed
     const currentSpeed = this.velocity.length();
@@ -580,7 +576,7 @@ export class Player implements MyGameEntity {
     if (
       this.isGrappling &&
       this.ropeContactPoint &&
-      !this.ropeContactPoint.getActive()
+      !this.ropeContactPoint.isActive
     ) {
       // Rope contact point is inactive, dismiss grappling
       this.onStopGrapple();

@@ -16,10 +16,6 @@ export class SceneTransition {
     this.pos.y = canvas.height;
   }
 
-  getState() {
-    return this.state;
-  }
-
   update() {
     // lerp will "never" reach target, so reduce by a small margin
     if (this.pos.y - 10 >= this.targetY) {
