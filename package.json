@@ -9,13 +9,17 @@
     "build": "tsc && vite build",
     "build:poki": "npm run build -- --mode=poki",
     "build:roadroller": "npm run build && npx roadroller dist/index.js -o dist/index.js",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "zipDist": "node --loader ts-node/esm zipDist.ts"
   },
   "author": "johnedvard@reitgames.com",
   "description": "",
   "devDependencies": {
+    "@types/archiver": "^6.0.3",
+    "archiver": "^7.0.1",
     "js13k-packer": "^1.0.2",
     "roadroller": "^2.1.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.2",
     "vite": "^6.3.5",
     "vite-plugin-minify": "^2.1.0"

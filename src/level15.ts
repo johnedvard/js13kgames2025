@@ -2,63 +2,60 @@ import { Vector } from "./Vector";
 
 export default function getLevel() {
   return {
-    playerPos: Vector(760, 604),
-    goalPos: Vector(310, 2028),
+    playerPos: Vector(1106, 842),
+    goalPos: Vector(4424, 738),
     background: {
       positions: [
-        Vector(76, 100),
-        Vector(2336, 104),
-        Vector(2332, 2716),
-        Vector(76, 2736),
+        Vector(788, 102),
+        Vector(4700, 112),
+        Vector(4708, 2442),
+        Vector(824, 2442),
       ],
     },
     objects: [
-      { box: { pos: Vector(0, 0), width: 200, height: 2800 } },
-      { shuriken: { pos: Vector(2044, 2464) } },
-      { pickup: { pos: Vector(1524, 932) } },
-      { pickup: { pos: Vector(364, 864) } },
-      { pickup: { pos: Vector(596, 2404) } },
+      { box: { pos: Vector(3496, 796), width: 1156, height: 200 } },
+      { pickup: { pos: Vector(2842, 334) } },
+      { pickup: { pos: Vector(2318, 2162) } },
+      { pickup: { pos: Vector(4258, 1202) } },
       {
-        ropeContactPoint: { pos: Vector(1032, 464), endPos: Vector(1032, 464) },
+        ropeContactPoint: { pos: Vector(1638, 718), endPos: Vector(1638, 718) },
       },
       {
-        ropeContactPoint: { pos: Vector(1968, 640), endPos: Vector(1968, 640) },
+        ropeContactPoint: { pos: Vector(3014, 606), endPos: Vector(3014, 606) },
+      },
+      {
+        laser: { startPoint: Vector(1400, 510), endPoint: Vector(1400, 1400) },
+      },
+      {
+        laser: { startPoint: Vector(1710, 1800), endPoint: Vector(2800, 1790) },
+      },
+      {
+        laser: { startPoint: Vector(3600, 1010), endPoint: Vector(3600, 1400) },
       },
       {
         ropeContactPoint: {
-          pos: Vector(1604, 1600),
-          endPos: Vector(1604, 1600),
+          pos: Vector(2256, 1204),
+          endPos: Vector(2256, 1204),
         },
       },
       {
-        ropeContactPoint: { pos: Vector(604, 1576), endPos: Vector(604, 1576) },
-      },
-      {
-        laser: { startPoint: Vector(1100, 2150), endPoint: Vector(2200, 2150) },
-      },
-      {
-        laser: { startPoint: Vector(932, 1100), endPoint: Vector(2200, 1100) },
-      },
-      { laser: { startPoint: Vector(600, 2100), endPoint: Vector(600, 200) } },
-      {
-        box: {
-          pos: Vector(160, 1044),
-          width: 760,
-          height: 120,
-          canBounce: true,
-        },
+        ropeContactPoint: { pos: Vector(4052, 420), endPos: Vector(4052, 420) },
       },
       {
         box: {
-          pos: Vector(132, 2100),
-          width: 964,
-          height: 120,
+          pos: Vector(1000, 1200),
+          width: 200,
+          height: 200,
           canBounce: true,
         },
       },
-      { box: { pos: Vector(96, 2600), width: 2204, height: 200 } },
-      { box: { pos: Vector(0, 0), width: 2400, height: 200 } },
-      { box: { pos: Vector(2200, 200), width: 200, height: 2600 } },
+      { box: { pos: Vector(700, 0), width: 1900, height: 500 } },
+      { box: { pos: Vector(2600, 0), width: 2200, height: 200 } },
+      { box: { pos: Vector(700, 500), width: 200, height: 1100 } },
+      { box: { pos: Vector(700, 1400), width: 1000, height: 1800 } },
+      { box: { pos: Vector(1616, 2400), width: 1236, height: 800 } },
+      { box: { pos: Vector(4600, 0), width: 200, height: 3200 } },
+      { box: { pos: Vector(2800, 1400), width: 2000, height: 1800 } },
     ],
   };
 }

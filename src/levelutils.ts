@@ -46,8 +46,8 @@ export const levels: Array<() => LevelObject> = [
   level12,
   level13,
   level14,
-  level16,
   level15,
+  level16,
   levelFinal,
 ];
 

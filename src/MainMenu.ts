@@ -50,16 +50,16 @@ export class MainMenu implements MyGameEntity {
   lastMouseY = 0;
 
   // Offscreen canvas for scrollable content
-  private offscreenCanvas: HTMLCanvasElement | null = null;
-  private offscreenCtx: CanvasRenderingContext2D | null = null;
+  offscreenCanvas: HTMLCanvasElement | null = null;
+  offscreenCtx: CanvasRenderingContext2D | null = null;
 
   // Pickup instances for pickups in buttons
-  private buttonPickups: Pickup[][] = [];
+  buttonPickups: Pickup[][] = [];
 
   // Button press animation properties
-  private pressedLevelButton: number | null = null;
-  private pressedScrollButton: "u" | "d" | null = null;
-  private isMouseDown = false; // Track if mouse is currently held down
+  pressedLevelButton: number | null = null;
+  pressedScrollButton: "u" | "d" | null = null;
+  isMouseDown = false; // Track if mouse is currently held down
 
   constructor(canvas?: HTMLCanvasElement) {
     this.canvas = canvas || null;
@@ -176,7 +176,7 @@ export class MainMenu implements MyGameEntity {
     }
   }
 
-  private createPickupsForLevel(
+  createPickupsForLevel(
     levelId: number,
     rectX: number,
     rectY: number,
@@ -210,7 +210,7 @@ export class MainMenu implements MyGameEntity {
     this.buttonPickups[levelIndex] = pickups;
   }
 
-  private renderPickupsOnButton(
+  renderPickupsOnButton(
     ctx: CanvasRenderingContext2D,
     levelIndex: number,
     pressOffset: number = 0
@@ -400,7 +400,7 @@ export class MainMenu implements MyGameEntity {
     return null;
   }
 
-  private isLevelPlayable(levelId: number): boolean {
+  isLevelPlayable(levelId: number): boolean {
     // Level 1 is always playable
     if (levelId == 1) return true;
 
@@ -509,7 +509,7 @@ export class MainMenu implements MyGameEntity {
     return null;
   }
 
-  private startPress(type: "l" | "s", id: number | "u" | "d") {
+  startPress(type: "l" | "s", id: number | "u" | "d") {
     this.isMouseDown = true;
     if (type == "l") {
       this.pressedLevelButton = id as number;
@@ -520,7 +520,7 @@ export class MainMenu implements MyGameEntity {
     this.renderAllButtonsToOffscreen();
   }
 
-  private endPress() {
+  endPress() {
     this.isMouseDown = false;
     this.pressedLevelButton = null;
     this.pressedScrollButton = null;
@@ -612,7 +612,7 @@ export class MainMenu implements MyGameEntity {
     ctx.restore();
   }
 
-  private drawTitle(ctx: CanvasRenderingContext2D) {
+  drawTitle(ctx: CanvasRenderingContext2D) {
     if (!this.canvas) return;
 
     const centerX = this.canvas.width / 2 - 550;
@@ -633,7 +633,7 @@ export class MainMenu implements MyGameEntity {
     ctx.fillText(title, centerX, titleY);
   }
 
-  private drawTriangle(
+  drawTriangle(
     ctx: CanvasRenderingContext2D,
     centerX: number,
     centerY: number,
@@ -656,7 +656,7 @@ export class MainMenu implements MyGameEntity {
     ctx.restore();
   }
 
-  private drawScrollButtons(ctx: CanvasRenderingContext2D) {
+  drawScrollButtons(ctx: CanvasRenderingContext2D) {
     if (!this.canvas) return;
 
     const centerX = this.canvas.width / 2;

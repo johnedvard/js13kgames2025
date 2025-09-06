@@ -26,18 +26,18 @@ export class Player implements MyGameEntity {
 
   // Collision and positioning
   radius = 79;
-  private catCenterX = -58;
-  private catCenterY = 95;
+  catCenterX = -58;
+  catCenterY = 95;
 
   // Headband threads using Verlet integration
-  private leftThread: VerletPoint[] = [];
-  private rightThread: VerletPoint[] = [];
-  private threadSegmentLength = 16;
-  private threadCount = 8;
+  leftThread: VerletPoint[] = [];
+  rightThread: VerletPoint[] = [];
+  threadSegmentLength = 16;
+  threadCount = 8;
 
   // Cached cat body rendering
-  private catBodyCanvas: OffscreenCanvas | null = null;
-  private catShadowCanvas: OffscreenCanvas | null = null;
+  catBodyCanvas: OffscreenCanvas | null = null;
+  catShadowCanvas: OffscreenCanvas | null = null;
 
   // Rope physics properties
   isGrappling: boolean = false;
@@ -67,7 +67,7 @@ export class Player implements MyGameEntity {
     this.listenForEvents();
   }
 
-  private initializeCatBodyCache() {
+  initializeCatBodyCache() {
     // Create an offscreen canvas to cache the normal cat body
     this.catBodyCanvas = new OffscreenCanvas(300, 300);
     const catBodyContext = this.catBodyCanvas.getContext("2d")!;
@@ -83,7 +83,7 @@ export class Player implements MyGameEntity {
     this.renderCatBodyToCanvas(catShadowContext, true);
   }
 
-  private initializeHeadbandThreads() {
+  initializeHeadbandThreads() {
     // Initialize left thread from left side of cat center (moved up and left)
     const catCenter = this.getCenterPosition();
     const leftAttachPos = Vector(catCenter.x - 30, catCenter.y - 30); // Moved left by 10 pixels
@@ -122,7 +122,7 @@ export class Player implements MyGameEntity {
     }
   }
 
-  private renderCatBodyToCanvas(
+  renderCatBodyToCanvas(
     ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
     isBlackShadow: boolean
   ) {
@@ -317,15 +317,12 @@ export class Player implements MyGameEntity {
   }
 
   // Render headband threads
-  private renderHeadbandThreads(context: CanvasRenderingContext2D) {
+  renderHeadbandThreads(context: CanvasRenderingContext2D) {
     this.renderThread(context, this.leftThread);
     this.renderThread(context, this.rightThread);
   }
 
-  private renderThread(
-    context: CanvasRenderingContext2D,
-    thread: VerletPoint[]
-  ) {
+  renderThread(context: CanvasRenderingContext2D, thread: VerletPoint[]) {
     context.save();
 
     // Render thread shadow first
@@ -344,7 +341,7 @@ export class Player implements MyGameEntity {
   }
 
   // Helper method to draw a smooth spline through the thread points
-  private drawSpline(
+  drawSpline(
     context: CanvasRenderingContext2D,
     thread: VerletPoint[],
     offsetX: number,
@@ -389,12 +386,12 @@ export class Player implements MyGameEntity {
   }
 
   // Helper method to get the center position of the cat body
-  private getCenterPosition() {
+  getCenterPosition() {
     return Vector(this.pos.x + this.catCenterX, this.pos.y + this.catCenterY);
   }
 
   // Helper method to get the rope attachment position (bottom of the cat)
-  private getRopeAttachmentPosition() {
+  getRopeAttachmentPosition() {
     return Vector(
       this.pos.x + this.catCenterX,
       this.pos.y + this.catCenterY + 40
@@ -402,7 +399,7 @@ export class Player implements MyGameEntity {
   }
 
   // Update headband threads using Verlet integration
-  private updateHeadbandThreads() {
+  updateHeadbandThreads() {
     const gravity = Vector(0, 0.2); // Gravity for threads
 
     // Calculate rotated anchor points
@@ -445,11 +442,7 @@ export class Player implements MyGameEntity {
     );
   }
 
-  private updateThread(
-    thread: VerletPoint[],
-    anchorPos: MyVector,
-    gravity: MyVector
-  ) {
+  updateThread(thread: VerletPoint[], anchorPos: MyVector, gravity: MyVector) {
     // Update positions using Verlet integration
     for (let i = 0; i < thread.length; i++) {
       const point = thread[i];
@@ -492,7 +485,7 @@ export class Player implements MyGameEntity {
     }
   }
 
-  private renderRope(context: CanvasRenderingContext2D) {
+  renderRope(context: CanvasRenderingContext2D) {
     if (!this.ropeContactPoint) return;
 
     const ropeAttachPos = this.getRopeAttachmentPosition();
@@ -600,7 +593,7 @@ export class Player implements MyGameEntity {
     this.pos = this.pos.add(this.velocity);
   }
 
-  private applyRopePhysics() {
+  applyRopePhysics() {
     if (!this.ropeContactPoint) return;
 
     // Update tween progress and apply easing to rope length

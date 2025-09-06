@@ -12,22 +12,22 @@ export class Pickup implements MyGameEntity {
   height = 128; // 4 times bigger (32 * 4)
 
   // Animation properties
-  private animationTime: number = 0;
-  private baseScale: number = 1;
-  private currentScale: number = 1;
-  private currentRotation: number = 0;
+  animationTime: number = 0;
+  baseScale: number = 1;
+  currentScale: number = 1;
+  currentRotation: number = 0;
 
   // Burst animation properties
-  private burstStartTime: number = 0;
-  private burstDuration: number = 1; // 1 second at 60fps
+  burstStartTime: number = 0;
+  burstDuration: number = 1; // 1 second at 60fps
 
   // Cached clover rendering (similar to Player's cat body)
-  private cloverCanvas: OffscreenCanvas | null = null;
-  private cloverContext: OffscreenCanvasRenderingContext2D | null = null;
-  private cloverShadowCanvas: OffscreenCanvas | null = null;
-  private cloverShadowContext: OffscreenCanvasRenderingContext2D | null = null;
+  cloverCanvas: OffscreenCanvas | null = null;
+  cloverContext: OffscreenCanvasRenderingContext2D | null = null;
+  cloverShadowCanvas: OffscreenCanvas | null = null;
+  cloverShadowContext: OffscreenCanvasRenderingContext2D | null = null;
 
-  private state: "c" | "d" | "a" = "a";
+  state: "c" | "d" | "a" = "a";
   collected = false;
   constructor(startPos: MyVector, private color = colorAccent) {
     this.pos = startPos;
@@ -39,7 +39,7 @@ export class Pickup implements MyGameEntity {
     this.update();
   }
 
-  private initializeCloverCache() {
+  initializeCloverCache() {
     // Create an offscreen canvas to cache the normal clover
     this.cloverCanvas = new OffscreenCanvas(200, 200);
     this.cloverContext = this.cloverCanvas.getContext("2d")!;
@@ -55,7 +55,7 @@ export class Pickup implements MyGameEntity {
     this.renderCloverToCanvas(this.cloverShadowContext, true);
   }
 
-  private renderCloverToCanvas(
+  renderCloverToCanvas(
     ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
     isBlackShadow: boolean
   ) {

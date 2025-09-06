@@ -41,7 +41,6 @@ export class Laser implements MyGameEntity {
     // Assume points are either on same X-axis (horizontal) or same Y-axis (vertical)
     const deltaX = Math.abs(this.endPoint.x - this.startPoint.x);
     const deltaY = Math.abs(this.endPoint.y - this.startPoint.y);
-    const offsetPosX = 20;
 
     if (deltaX > deltaY) {
       // Horizontal laser - width is the distance, height is the beam width
@@ -55,7 +54,7 @@ export class Laser implements MyGameEntity {
 
     // Set position to the top-left corner of the bounding box
     this.pos = Vector(
-      Math.min(this.startPoint.x, this.endPoint.x) - offsetPosX,
+      Math.min(this.startPoint.x, this.endPoint.x) - 20,
       Math.min(this.startPoint.y, this.endPoint.y)
     );
   }
@@ -96,10 +95,6 @@ export class Laser implements MyGameEntity {
     }
   }
 
-  setActive(active: boolean) {
-    this.isActive = active;
-  }
-
   render(context: CanvasRenderingContext2D) {
     context.save();
 
@@ -135,17 +130,13 @@ export class Laser implements MyGameEntity {
 
     // Draw warning indicator (thin red line) before laser activates
     if (this.isWarning) {
-      context.strokeStyle = "#ff0000";
+      context.strokeStyle = "#f00";
       context.lineWidth = 3;
-
-      context.setLineDash([]); // Dashed line for warning
 
       context.beginPath();
       context.moveTo(this.startPoint.x, this.startPoint.y);
       context.lineTo(this.endPoint.x, this.endPoint.y);
       context.stroke();
-
-      context.setLineDash([]); // Reset line dash
     }
 
     // Only render main beam if there's something to show (beam progress or fade progress)
@@ -183,25 +174,19 @@ export class Laser implements MyGameEntity {
       // Calculate tapered width - starts wide, quickly goes to default
       // Use exponential decay for quick tapering
       const startWidth = this.beamWidth * 3; // Start 3x wider
-      const endWidth = this.beamWidth;
-      const widthProgress = Math.pow(t1, 0.3); // Quick tapering with power curve
-      const baseWidth =
-        startWidth * (1 - widthProgress) + endWidth * widthProgress;
-
-      // Apply fade effect to width
-      const segmentWidth = baseWidth * this.fadeProgress;
+      const baseWidth = startWidth;
 
       // Draw main beam segment
-      context.strokeStyle = "#ff0000";
-      context.lineWidth = segmentWidth;
+      context.strokeStyle = "#f00";
+      context.lineWidth = baseWidth * this.fadeProgress;
       context.beginPath();
       context.moveTo(x1, y1);
       context.lineTo(x2, y2);
       context.stroke();
 
       // Draw brighter core beam
-      context.strokeStyle = "#ff4444";
-      context.lineWidth = Math.max(0.1, segmentWidth * 0.5);
+      context.strokeStyle = "#f44";
+      context.lineWidth = baseWidth * this.fadeProgress * 0.5;
 
       context.beginPath();
       context.moveTo(x1, y1);

@@ -8,8 +8,8 @@ export class Goal implements MyGameEntity {
   type = GameObjectType.Goal;
   width: number = 200;
   height: number = 150;
-  private radiusX = 100;
-  private radiusY = 150;
+  radiusX = 100;
+  radiusY = 150;
   constructor(pos: MyVector) {
     this.pos = pos;
   }

@@ -11,19 +11,19 @@ export class Shuriken implements MyGameEntity {
 
   radius = 55; // Collision radius
 
-  private rotation = 0;
-  private rotationSpeed = 0.08; // Spinning speed
+  rotation = 0;
+  rotationSpeed = 0.08; // Spinning speed
 
   // Cached shuriken blade rendering (similar to Pickup's clover cache)
-  private bladeCanvas: OffscreenCanvas | null = null;
-  private bladeContext: OffscreenCanvasRenderingContext2D | null = null;
+  bladeCanvas: OffscreenCanvas | null = null;
+  bladeContext: OffscreenCanvasRenderingContext2D | null = null;
 
   constructor(startPos: MyVector) {
     this.pos = startPos;
     this.initializeBladeCache();
   }
 
-  private initializeBladeCache() {
+  initializeBladeCache() {
     // Create an offscreen canvas to cache the complete shuriken (all 4 blades)
     this.bladeCanvas = new OffscreenCanvas(400, 400);
     this.bladeContext = this.bladeCanvas.getContext("2d")!;
@@ -32,7 +32,7 @@ export class Shuriken implements MyGameEntity {
     this.renderBladeToCanvas(this.bladeContext);
   }
 
-  private renderBladeToCanvas(
+  renderBladeToCanvas(
     ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
   ) {
     ctx.translate(233, 182); // Center the complete shuriken in the cache canvas, for rotation
@@ -120,7 +120,7 @@ export class Shuriken implements MyGameEntity {
     ctx.restore();
   }
 
-  private renderShuriken(ctx: CanvasRenderingContext2D): void {
+  renderShuriken(ctx: CanvasRenderingContext2D): void {
     if (!this.bladeCanvas) return;
 
     // Draw the complete cached shuriken (all 4 blades)

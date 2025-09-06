@@ -133,6 +133,7 @@
           <button class="tool-button" data-tool="pickup">Add Pickup</button>
           <button class="tool-button" data-tool="shuriken">Add Shuriken</button>
           <button class="tool-button" data-tool="rope">Add Rope Point</button>
+          <button class="tool-button" data-tool="laser">Add Laser</button>
           <button class="tool-button" data-tool="background">
             Edit Background
           </button>
@@ -499,6 +500,25 @@
                 ref: obj,
               };
             }
+            if (
+              obj.laser &&
+              this.isPointInCircle(
+                x,
+                y,
+                obj.laser.startPoint.x,
+                obj.laser.startPoint.y,
+                20
+              )
+            ) {
+              return {
+                type: "laser",
+                x: obj.laser.startPoint.x,
+                y: obj.laser.startPoint.y,
+                endX: obj.laser.endPoint.x,
+                endY: obj.laser.endPoint.y,
+                ref: obj,
+              };
+            }
           }
 
           // Check background points (only when in select mode, since background mode already checked above)
@@ -749,6 +769,14 @@
                 },
               });
               break;
+            case "laser":
+              this.level.objects.push({
+                laser: {
+                  startPoint: { x, y },
+                  endPoint: { x: x + 200, y }, // Default endpoint 200 pixels to the right
+                },
+              });
+              break;
             case "background":
               // ...existing code...
               if (!this.level.background) {
@@ -889,6 +917,27 @@
               }
             );
           }
+          if (this.selectedObject.type === "laser") {
+            // Add inputs for laser end position
+            createInput(
+              "End X",
+              this.selectedObject.endX ?? this.selectedObject.x + 200,
+              (e) => {
+                this.selectedObject.endX = parseFloat(e.target.value) || 0;
+                this.updateObjectReference();
+                this.render();
+              }
+            );
+            createInput(
+              "End Y",
+              this.selectedObject.endY ?? this.selectedObject.y,
+              (e) => {
+                this.selectedObject.endY = parseFloat(e.target.value) || 0;
+                this.updateObjectReference();
+                this.render();
+              }
+            );
+          }
           if (this.selectedObject.type === "backgroundPoint") {
             // ...existing code for backgroundPoint delete...
             const deleteBtn = document.createElement("button");
@@ -963,6 +1012,21 @@
                 ref.ropeContactPoint.endPos.x =
                   this.selectedObject.endX ?? this.selectedObject.x;
                 ref.ropeContactPoint.endPos.y =
+                  this.selectedObject.endY ?? this.selectedObject.y;
+              }
+            } else if (ref.laser) {
+              ref.laser.startPoint.x = this.selectedObject.x;
+              ref.laser.startPoint.y = this.selectedObject.y;
+              // Update endPoint
+              if (!ref.laser.endPoint) {
+                ref.laser.endPoint = {
+                  x: this.selectedObject.endX ?? this.selectedObject.x + 200,
+                  y: this.selectedObject.endY ?? this.selectedObject.y,
+                };
+              } else {
+                ref.laser.endPoint.x =
+                  this.selectedObject.endX ?? this.selectedObject.x + 200;
+                ref.laser.endPoint.y =
                   this.selectedObject.endY ?? this.selectedObject.y;
               }
             }
@@ -1117,6 +1181,45 @@
                 this.ctx.setLineDash([]);
               }
             }
+            if (obj.laser) {
+              // Draw laser line
+              this.ctx.strokeStyle = "#ff0000";
+              this.ctx.lineWidth = 4 / this.scale;
+              this.ctx.beginPath();
+              this.ctx.moveTo(obj.laser.startPoint.x, obj.laser.startPoint.y);
+              this.ctx.lineTo(obj.laser.endPoint.x, obj.laser.endPoint.y);
+              this.ctx.stroke();
+
+              // Draw start point marker
+              this.ctx.fillStyle = "#ff0000";
+              this.ctx.beginPath();
+              this.ctx.arc(
+                obj.laser.startPoint.x,
+                obj.laser.startPoint.y,
+                15,
+                0,
+                Math.PI * 2
+              );
+              this.ctx.fill();
+              this.ctx.strokeStyle = "black";
+              this.ctx.lineWidth = 2 / this.scale;
+              this.ctx.stroke();
+
+              // Draw end point marker
+              this.ctx.fillStyle = "#ff4444";
+              this.ctx.beginPath();
+              this.ctx.arc(
+                obj.laser.endPoint.x,
+                obj.laser.endPoint.y,
+                10,
+                0,
+                Math.PI * 2
+              );
+              this.ctx.fill();
+              this.ctx.strokeStyle = "black";
+              this.ctx.lineWidth = 2 / this.scale;
+              this.ctx.stroke();
+            }
           });
 
           // Draw player
@@ -1211,6 +1314,8 @@
                   ? 32
                   : this.selectedObject.type === "rope"
                   ? 42
+                  : this.selectedObject.type === "laser"
+                  ? 17
                   : 22;
               this.ctx.beginPath();
               this.ctx.arc(
@@ -1221,6 +1326,19 @@
                 Math.PI * 2
               );
               this.ctx.stroke();
+
+              // Draw laser endpoint highlight if it's a laser
+              if (this.selectedObject.type === "laser") {
+                this.ctx.beginPath();
+                this.ctx.arc(
+                  this.selectedObject.endX ?? this.selectedObject.x + 200,
+                  this.selectedObject.endY ?? this.selectedObject.y,
+                  12,
+                  0,
+                  Math.PI * 2
+                );
+                this.ctx.stroke();
+              }
             }
           }
 
@@ -1312,6 +1430,10 @@ export default function getLevel() {
           }
           ropeStr += ` } }`;
           return ropeStr;
+        }
+        if (obj.laser) {
+          const laser = obj.laser;
+          return `\n      { laser: { startPoint: Vector(${laser.startPoint.x}, ${laser.startPoint.y}), endPoint: Vector(${laser.endPoint.x}, ${laser.endPoint.y}) } }`;
         }
         return "";
       })

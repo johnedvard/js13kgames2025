@@ -9,7 +9,7 @@ export class Ball implements MyGameEntity {
   velocity = Vector(0, 0);
   radius = 15;
   gravity = 0.3;
-  private shadowColor: string; // Pre-calculated shadow color
+  shadowColor: string; // Pre-calculated shadow color
 
   constructor(startPos: MyVector, private color: string) {
     this.pos = startPos || Vector(0, 0);

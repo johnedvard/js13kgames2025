@@ -54,11 +54,11 @@ let levelBackground: any = null; // Store the current level's background
 let skyLine: SkyLine | null = null; // City skyline renderer
 
 class SkyLine {
-  private positions: any[] = [];
-  private buildings: any[] = [];
-  private levelCenterX: number = 0; // Cache level center
-  private lastPlayerX: number = 0; // Cache last player position
-  private cachedParallaxOffset: number = 0; // Cache parallax calculation
+  positions: any[] = [];
+  buildings: any[] = [];
+  levelCenterX: number = 0; // Cache level center
+  lastPlayerX: number = 0; // Cache last player position
+  cachedParallaxOffset: number = 0; // Cache parallax calculation
 
   constructor(positions: any[]) {
     this.positions = positions;
@@ -71,7 +71,7 @@ class SkyLine {
     }
   }
 
-  private generateBuildings() {
+  generateBuildings() {
     if (!this.positions || this.positions.length === 0) return;
 
     // Calculate bounds of the background polygon
@@ -153,7 +153,7 @@ class SkyLine {
     this.renderCachedBuildings(context, this.cachedParallaxOffset);
   }
 
-  private renderCachedBuildings(
+  renderCachedBuildings(
     context: CanvasRenderingContext2D,
     parallaxOffset: number = 0
   ) {

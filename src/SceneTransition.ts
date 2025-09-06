@@ -8,10 +8,10 @@ const enum TransitionState {
   Complete = "c",
 }
 export class SceneTransition {
-  private targetY = -10;
-  private lerpFactor = 0.15;
+  targetY = -10;
+  lerpFactor = 0.15;
   pos = Vector(0, 0);
-  private state: TransitionState = TransitionState.FadeIn;
+  state: TransitionState = TransitionState.FadeIn;
   constructor(private canvas: HTMLCanvasElement) {
     this.pos.y = canvas.height;
   }
