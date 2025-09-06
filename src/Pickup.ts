@@ -1,7 +1,7 @@
 import { Vector, MyVector } from "./Vector";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
-import { colorAccent, colorBlack, colorShadow } from "./colorUtils";
+import { colorAccent, colorShadow } from "./colorUtils";
 
 import { playPickup } from "./audio";
 
