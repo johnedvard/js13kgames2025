@@ -4,7 +4,7 @@ import { findClosestRopeContactPoint } from "./main";
 import { RopeContactPoint } from "./RopeContactPoint";
 import { MyGameEntity } from "./MyGameEntity";
 import { GameObjectType } from "./GameObjectType";
-import { colorAccent, colorBlack, colorWhite } from "./colorUtils";
+import { colorAccent, colorBlack, colorShadow, colorWhite } from "./colorUtils";
 import { playRopeExtend } from "./audio";
 import { easeOutCubic } from "./mathUtils";
 import { MyVector, Vector } from "./Vector";
@@ -138,12 +138,12 @@ export class Player implements MyGameEntity {
     ctx.bezierCurveTo(-126, 126, -128, -24, -113, 0); // Reduced Y from 156 to 126 (moved up ~30px)
     ctx.bezierCurveTo(-79, 41, -37, 48, 0, 0); // Reduced Y from 51,58 to 41,48 (moved up ~10px)
     ctx.closePath();
-    ctx.fillStyle = colorBlack;
+    ctx.fillStyle = isBlackShadow ? colorShadow : colorBlack;
     ctx.fill();
 
     // headband
     ctx.save();
-    ctx.fillStyle = isBlackShadow ? colorBlack : colorAccent;
+    ctx.fillStyle = isBlackShadow ? colorShadow : colorAccent;
     ctx.fillRect(-125, 45, 137, 41);
     ctx.restore();
 
@@ -188,7 +188,7 @@ export class Player implements MyGameEntity {
         offsetY
       );
       ctx.closePath();
-      ctx.fillStyle = isBlackShadow ? colorBlack : colorWhite;
+      ctx.fillStyle = isBlackShadow ? colorShadow : colorWhite;
       ctx.fill();
 
       // Pupil
@@ -509,7 +509,7 @@ export class Player implements MyGameEntity {
     // Render rope shadow first (8px down and left)
     context.save();
 
-    context.strokeStyle = colorBlack; // Black shadow
+    context.strokeStyle = colorShadow; // Black shadow
     context.lineWidth = 25;
 
     context.beginPath();

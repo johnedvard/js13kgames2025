@@ -1,7 +1,7 @@
 import { Vector, MyVector } from "./Vector";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
-import { colorAccent, colorBlack } from "./colorUtils";
+import { colorAccent, colorBlack, colorShadow } from "./colorUtils";
 
 import { playPickup } from "./audio";
 
@@ -63,7 +63,7 @@ export class Pickup implements MyGameEntity {
 
     const drawStalk = () => {
       ctx.save();
-      ctx.strokeStyle = isBlackShadow ? colorBlack : this.color;
+      ctx.strokeStyle = isBlackShadow ? colorShadow : this.color;
       ctx.lineWidth = 10;
 
       ctx.beginPath();
@@ -77,7 +77,7 @@ export class Pickup implements MyGameEntity {
       ctx.save();
       ctx.translate(offsetX, offsetY);
       ctx.rotate(rotation);
-      ctx.fillStyle = isBlackShadow ? colorBlack : this.color;
+      ctx.fillStyle = isBlackShadow ? colorShadow : this.color;
       ctx.beginPath();
 
       const centerAdjustX = 3;
