@@ -1,7 +1,7 @@
+import { colorBlack } from "./colorUtils";
 import { GameObjectType } from "./GameObjectType";
 import { MyGameEntity } from "./MyGameEntity";
 import { Vector, MyVector } from "./Vector";
-import { colorBlack } from "./colorUtils";
 
 export class Ball implements MyGameEntity {
   type = GameObjectType.Ball;
@@ -9,9 +9,12 @@ export class Ball implements MyGameEntity {
   velocity = Vector(0, 0);
   radius = 15;
   gravity = 0.3;
+  private shadowColor: string; // Pre-calculated shadow color
 
   constructor(startPos: MyVector, private color: string) {
     this.pos = startPos || Vector(0, 0);
+
+    this.shadowColor = colorBlack;
 
     // Add initial random speed
     const randomSpeedX = (Math.random() - 0.5) * 10; // Random X velocity between -5 and 5
@@ -28,35 +31,16 @@ export class Ball implements MyGameEntity {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    ctx.save();
-
-    // Draw shadow circle first
+    ctx.fillStyle = this.shadowColor;
     ctx.beginPath();
-    ctx.fillStyle = colorBlack;
-    ctx.globalAlpha = 0.7;
-    ctx.arc(
-      this.pos.x - this.radius / 2 + 4,
-      this.pos.y + this.radius + 4,
-      this.radius,
-      0,
-      Math.PI * 2
-    );
+    ctx.arc(this.pos.x + 3, this.pos.y + 3, this.radius, 0, Math.PI * 2);
     ctx.fill();
 
-    // Draw main circle
-    ctx.beginPath();
+    // Draw main ball
     ctx.fillStyle = this.color;
-    ctx.globalAlpha = 1;
-    ctx.arc(
-      this.pos.x - this.radius / 2,
-      this.pos.y + this.radius,
-      this.radius,
-      0,
-      Math.PI * 2
-    );
+    ctx.beginPath();
+    ctx.arc(this.pos.x, this.pos.y, this.radius, 0, Math.PI * 2);
     ctx.fill();
-
-    ctx.restore();
   }
 
   // Ball-specific properties and methods go here

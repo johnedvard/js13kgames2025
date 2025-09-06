@@ -77,30 +77,30 @@ export default function getLevel() {
         },
       },
       {
-        box: { pos: Vector(200, 0), width: 3800, height: 200, canBounce: true },
-      },
-      {
-        box: {
-          pos: Vector(0, 3000),
-          width: 4400,
-          height: 200,
-          canBounce: true,
-        },
-      },
-      { box: { pos: Vector(0, 0), width: 200, height: 3000, canBounce: true } },
-      {
-        box: {
-          pos: Vector(4000, 0),
-          width: 400,
-          height: 3000,
-          canBounce: true,
-        },
-      },
-      {
         box: {
           pos: Vector(2450, 1300),
           width: 200,
           height: 1700,
+          canBounce: true,
+        },
+      },
+      {
+        box: { pos: Vector(200, 0), width: 3800, height: 200, canBounce: true },
+      },
+      {
+        box: {
+          pos: Vector(200, 3000),
+          width: 3800,
+          height: 200,
+          canBounce: true,
+        },
+      },
+      { box: { pos: Vector(0, 0), width: 200, height: 3200, canBounce: true } },
+      {
+        box: {
+          pos: Vector(4000, 0),
+          width: 400,
+          height: 3200,
           canBounce: true,
         },
       },

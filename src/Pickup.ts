@@ -61,10 +61,6 @@ export class Pickup implements MyGameEntity {
   ) {
     ctx.translate(100, 100); // Center the clover in the cache canvas
 
-    // Set global alpha for shadow
-    if (isBlackShadow) {
-      ctx.globalAlpha = 0.4;
-    }
     const drawStalk = () => {
       ctx.save();
       ctx.strokeStyle = isBlackShadow ? colorBlack : this.color;
@@ -150,11 +146,8 @@ export class Pickup implements MyGameEntity {
     ctx.translate(this.pos.x + this.width / 2, this.pos.y + this.height / 2);
 
     // Calculate animation values
-    const alpha = 1 - burstProgress; // Fade from 1 to 0
     const scale = 1 - burstProgress * 0.5; // Scale down to 50%
     const moveDistance = burstProgress * 180; // Move up to 80 pixels away
-
-    ctx.globalAlpha = alpha;
 
     // Helper function to draw individual leaf
     const drawLeaf = (

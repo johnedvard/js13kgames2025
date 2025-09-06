@@ -170,6 +170,9 @@ export class MainMenu implements MyGameEntity {
         numCollected,
         pressOffset
       );
+
+      // Render pickups directly on the button in the offscreen canvas
+      this.renderPickupsOnButton(ctx, levelId - 1, pressOffset);
     }
   }
 
@@ -205,6 +208,37 @@ export class MainMenu implements MyGameEntity {
     }
 
     this.buttonPickups[levelIndex] = pickups;
+  }
+
+  private renderPickupsOnButton(
+    ctx: CanvasRenderingContext2D,
+    levelIndex: number,
+    pressOffset: number = 0
+  ) {
+    const pickups = this.buttonPickups[levelIndex];
+    if (!pickups) return;
+
+    // Render each pickup directly on the offscreen canvas
+    for (const pickup of pickups) {
+      ctx.save();
+
+      // Position pickup relative to button position with press offset
+      const pickupX = pickup.pos.x + pressOffset;
+      const pickupY = pickup.pos.y + pressOffset;
+
+      // Set position for rendering
+      pickup.pos.x = pickupX;
+      pickup.pos.y = pickupY;
+
+      // Render the pickup directly to the offscreen canvas
+      pickup.render(ctx);
+
+      // Restore original position (relative to button)
+      pickup.pos.x = pickupX - pressOffset;
+      pickup.pos.y = pickupY - pressOffset;
+
+      ctx.restore();
+    }
   }
 
   getVisibleLevels() {
@@ -383,13 +417,6 @@ export class MainMenu implements MyGameEntity {
     return levelId <= highestCompleted + 1;
   }
 
-  private isVisibleInScrollArea(screenY: number): boolean {
-    return (
-      screenY > this.scrollAreaTop - this.buttonHeight &&
-      screenY < this.scrollAreaTop + this.scrollAreaHeight
-    );
-  }
-
   handleClick(x: number, y: number) {
     // Check if click is on scroll buttons first
     const scrollButtonClick = this.isPointInScrollButton(x, y);
@@ -542,65 +569,10 @@ export class MainMenu implements MyGameEntity {
     // Draw level selection area
     this.drawLevelList(ctx);
 
-    // Draw pickup instances
-    this.renderPickupInstances(ctx);
-
     // Draw scroll buttons
     this.drawScrollButtons(ctx);
 
     // Restore the previous transform
-    ctx.restore();
-  }
-
-  private renderPickupInstances(ctx: CanvasRenderingContext2D) {
-    if (!this.canvas) return;
-
-    const centerX = this.canvas.width / 2;
-    const listWidth = 400;
-    const scrollAreaLeft = centerX - listWidth / 2;
-
-    // Set up clipping region for the scroll area
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(
-      scrollAreaLeft,
-      this.scrollAreaTop,
-      listWidth,
-      this.scrollAreaHeight
-    );
-    ctx.clip();
-
-    // Render pickup instances for each level
-    for (let i = 0; i < this.totalLevels; i++) {
-      const pickups = this.buttonPickups[i]; // Use array index directly
-
-      if (pickups) {
-        // Calculate button position in the scrolled view
-        const buttonY = i * (this.buttonHeight + this.buttonSpacing);
-        const screenY = buttonY - this.scrollOffset + this.scrollAreaTop;
-
-        // Only render if the button is visible
-        if (this.isVisibleInScrollArea(screenY)) {
-          for (const pickup of pickups) {
-            ctx.save();
-            // Position relative to the screen coordinates
-            const originalPosX = pickup.pos.x;
-            const originalPosY = pickup.pos.y;
-            pickup.pos.x = scrollAreaLeft + pickup.pos.x;
-            pickup.pos.y =
-              screenY + (pickup.pos.y - (buttonY + this.buttonHeight / 2 - 64));
-
-            pickup.render(ctx);
-
-            // Restore original position
-            pickup.pos.x = originalPosX;
-            pickup.pos.y = originalPosY;
-            ctx.restore();
-          }
-        }
-      }
-    }
-
     ctx.restore();
   }
 
@@ -621,7 +593,6 @@ export class MainMenu implements MyGameEntity {
       listWidth + shadowOffset, // Include shadow space in clipping
       this.scrollAreaHeight
     );
-    ctx.clip();
 
     // If there's a shaking button, we need to draw it separately with rotation
 

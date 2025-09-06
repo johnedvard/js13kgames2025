@@ -44,21 +44,36 @@ export class Box implements MyGameEntity {
   render(context: CanvasRenderingContext2D) {
     context.save();
 
-    // Render shadow box behind the original (x+4, y+4 with 0.7 opacity)
-    context.globalAlpha = 0.9;
     context.fillStyle = colorBlack;
     context.fillRect(this.pos.x + 14, this.pos.y + 14, this.width, this.height);
 
-    // Render original box
-    context.globalAlpha = 1.0;
     context.fillStyle = colorWall; // cat noir color
     context.fillRect(this.pos.x, this.pos.y, this.width, this.height);
 
-    // Add white stroke if canBounce is true
+    // Optimized white border for Safari - use fillRect instead of strokeRect
     if (this.canBounce) {
-      context.strokeStyle = colorWhite;
-      context.lineWidth = this.strokeWidth;
-      context.strokeRect(this.pos.x, this.pos.y, this.width, this.height);
+      const borderWidth = Math.round(this.strokeWidth); // Round for pixel-perfect rendering
+      context.fillStyle = colorWhite;
+
+      // Draw border as four rectangles instead of using strokeRect
+      // Top border
+      context.fillRect(this.pos.x, this.pos.y, this.width, borderWidth);
+      // Bottom border
+      context.fillRect(
+        this.pos.x,
+        this.pos.y + this.height - borderWidth,
+        this.width,
+        borderWidth
+      );
+      // Left border
+      context.fillRect(this.pos.x, this.pos.y, borderWidth, this.height);
+      // Right border
+      context.fillRect(
+        this.pos.x + this.width - borderWidth,
+        this.pos.y,
+        borderWidth,
+        this.height
+      );
     }
 
     context.restore();

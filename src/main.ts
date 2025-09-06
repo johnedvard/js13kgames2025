@@ -56,10 +56,19 @@ let skyLine: SkyLine | null = null; // City skyline renderer
 class SkyLine {
   private positions: any[] = [];
   private buildings: any[] = [];
+  private levelCenterX: number = 0; // Cache level center
+  private lastPlayerX: number = 0; // Cache last player position
+  private cachedParallaxOffset: number = 0; // Cache parallax calculation
 
   constructor(positions: any[]) {
     this.positions = positions;
     this.generateBuildings();
+    // Pre-calculate level center once
+    if (this.positions && this.positions.length > 0) {
+      const minX = Math.min(...this.positions.map((p: any) => p.x));
+      const maxX = Math.max(...this.positions.map((p: any) => p.x));
+      this.levelCenterX = (minX + maxX) / 2;
+    }
   }
 
   private generateBuildings() {
@@ -133,32 +142,15 @@ class SkyLine {
     )
       return;
 
-    // Calculate parallax offset based on player position
-    let parallaxOffset = 0;
-    if (playerPos) {
-      // Subtle parallax effect: move buildings 1/8th the distance of player movement
-      // Use a reference point (like level center) to calculate relative movement
-      const levelCenterX =
-        (Math.min(...this.positions.map((p: any) => p.x)) +
-          Math.max(...this.positions.map((p: any) => p.x))) /
-        2;
-      parallaxOffset = (playerPos.x - levelCenterX) * -0.025; // 2.5% of player movement
+    // Calculate parallax offset only if player position changed significantly
+    if (playerPos && Math.abs(playerPos.x - this.lastPlayerX) > 5) {
+      this.cachedParallaxOffset = (playerPos.x - this.levelCenterX) * -0.025;
+      this.lastPlayerX = playerPos.x;
     }
 
-    // Set up clipping path using the same coordinates as the background
-    context.save();
-    context.beginPath();
-    context.moveTo(this.positions[0].x, this.positions[0].y);
-    for (let i = 1; i < this.positions.length; i++) {
-      context.lineTo(this.positions[i].x, this.positions[i].y);
-    }
-    context.closePath();
-    context.clip();
-
-    // Draw cached buildings with parallax offset
-    this.renderCachedBuildings(context, parallaxOffset);
-
-    context.restore();
+    // Use requestAnimationFrame-friendly rendering without clipping for Safari
+    // Instead of clipping, we'll render buildings and let overdraw handle boundaries
+    this.renderCachedBuildings(context, this.cachedParallaxOffset);
   }
 
   private renderCachedBuildings(
@@ -167,8 +159,9 @@ class SkyLine {
   ) {
     context.fillStyle = colorBuilding;
 
-    // Draw each cached building
-    for (const building of this.buildings) {
+    // Draw each cached building except the first and last one
+    for (let i = 1; i < this.buildings.length - 1; i++) {
+      const building = this.buildings[i];
       // Draw building rectangle with parallax offset
       context.fillRect(
         building.x + parallaxOffset,
@@ -281,9 +274,12 @@ const mainLoop = GameLoop({
       _objects.forEach((object) => object.update());
       levelPersistentObjects.forEach((object) => object.update());
       camera?.follow(_player);
-      // consider not adding levelPersistentObjects to the collision detection
-      handlePlayerCollisions(_player, [..._objects, ...levelPersistentObjects]);
-      handleOtherCollisions([..._objects, ...levelPersistentObjects]);
+
+      // Optimize collision detection by avoiding array spread for Safari
+      const allObjects = _objects.concat(levelPersistentObjects);
+      handlePlayerCollisions(_player, allObjects);
+      handleOtherCollisions(allObjects);
+
       highlightClosestRopeContactPoint();
     }
   },

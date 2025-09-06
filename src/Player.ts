@@ -128,11 +128,6 @@ export class Player implements MyGameEntity {
   ) {
     ctx.translate(150, 100); // Center the cat in the cache canvas
 
-    // Set global alpha for shadow
-    if (isBlackShadow) {
-      ctx.globalAlpha = 0.4;
-    }
-
     // Start at (0,0) - main cat body using new SVG path
     // Original path: M666,493C686.516,460.905 677.789,657.701 666.276,672.808C648.758,695.793 572.861,697.023 553,668.702C539.76,649.823 537.699,469.646 553,493C586.474,544.091 628.964,550.939 666,493
     // Converted to start at (0,0), removed decimals, and shortened bottom by ~30px
@@ -334,13 +329,13 @@ export class Player implements MyGameEntity {
     context.save();
 
     // Render thread shadow first
-    context.globalAlpha = 0.8;
+
     context.strokeStyle = colorBlack;
     context.lineWidth = 30; // 10 times larger than original (3 * 10)
     this.drawSpline(context, thread, 4, 4); // Shadow offset
 
     // Render main thread
-    context.globalAlpha = 1;
+
     context.strokeStyle = colorAccent; // Same color as headband
     context.lineWidth = 30; // 10 times larger than original (3 * 10)
     this.drawSpline(context, thread, 0, 0); // No offset
@@ -513,7 +508,7 @@ export class Player implements MyGameEntity {
 
     // Render rope shadow first (8px down and left)
     context.save();
-    context.globalAlpha = 0.4;
+
     context.strokeStyle = colorBlack; // Black shadow
     context.lineWidth = 25;
 

@@ -96,11 +96,10 @@ export class RopeContactPoint implements MyGameEntity {
     // Render white highlight circle behind everything if this is the closest rope point
     if (this.isHighlighted) {
       context.fillStyle = colorWhite;
-      context.globalAlpha = 0.8;
+
       context.beginPath();
       context.arc(this.pos.x, this.pos.y, this.radius + 10, 0, Math.PI * 2);
       context.fill();
-      context.globalAlpha = 1.0; // Reset alpha for other elements
     }
 
     // Choose color based on active state
@@ -137,7 +136,6 @@ export class RopeContactPoint implements MyGameEntity {
 
       // Draw the remaining arc in a dimmer color
       context.strokeStyle = colorGray;
-      context.globalAlpha = 0.3;
       context.lineWidth = 2;
       context.beginPath();
       context.arc(
@@ -148,13 +146,12 @@ export class RopeContactPoint implements MyGameEntity {
         startAngle + 2 * Math.PI
       );
       context.stroke();
-      context.globalAlpha = 1.0; // Reset alpha
     }
 
     // Only render inner circle and shadow when active
     if (this.isActive) {
       // Draw shadow for the inner circle (14px offset, black, 0.7 opacity)
-      context.globalAlpha = 0.4;
+
       context.fillStyle = colorBlack;
       context.beginPath();
       context.arc(
@@ -167,7 +164,7 @@ export class RopeContactPoint implements MyGameEntity {
       context.fill();
 
       // Draw small filled circle in the center
-      context.globalAlpha = 1.0;
+
       context.fillStyle = colorWall; // Same color as the stroke
       context.beginPath();
       context.arc(this.pos.x, this.pos.y, this.radius * 0.5, 0, Math.PI * 2); // 30% of the outer radius

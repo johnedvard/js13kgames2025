@@ -8,7 +8,6 @@ export class Goal implements MyGameEntity {
   type = GameObjectType.Goal;
   width: number = 200;
   height: number = 150;
-  private alpha: number = 1;
   private radiusX = 100;
   private radiusY = 150;
   constructor(pos: MyVector) {
@@ -19,7 +18,6 @@ export class Goal implements MyGameEntity {
 
   render(context: CanvasRenderingContext2D) {
     context.save();
-    context.globalAlpha = this.alpha;
 
     context.beginPath();
     context.ellipse(

@@ -27,7 +27,7 @@ export default function getLevel() {
       { ropeContactPoint: { pos: Vector(751, 448) } },
       { ropeContactPoint: { pos: Vector(3812, 1400) } },
       { shuriken: { pos: Vector(3816, 1812) } },
-      { box: { pos: Vector(0, 1300), width: 1000, height: 200 } },
+      { box: { pos: Vector(0, 1300), width: 1000, height: 1700 } },
       { box: { pos: Vector(200, 0), width: 4600, height: 200 } },
       { box: { pos: Vector(800, 1300), width: 200, height: 1700 } },
       { box: { pos: Vector(800, 2800), width: 4000, height: 200 } },

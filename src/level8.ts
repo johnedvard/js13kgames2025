@@ -15,12 +15,7 @@ export default function getLevel() {
       ],
     },
     objects: [
-      {
-        ropeContactPoint: {
-          pos: Vector(1012, 1004),
-          canActivate: true,
-        },
-      },
+      { ropeContactPoint: { pos: Vector(1012, 1004), canActivate: true } },
       {
         ropeContactPoint: {
           pos: Vector(1628, 1204),
@@ -28,12 +23,7 @@ export default function getLevel() {
           isActive: false,
         },
       },
-      {
-        ropeContactPoint: {
-          pos: Vector(2208, 1388),
-          canActivate: true,
-        },
-      },
+      { ropeContactPoint: { pos: Vector(2208, 1388), canActivate: true } },
       {
         ropeContactPoint: {
           pos: Vector(2812, 1404),
@@ -48,11 +38,11 @@ export default function getLevel() {
       { pickup: { pos: Vector(1992, 1580) } },
       { pickup: { pos: Vector(2584, 1660) } },
       { shuriken: { pos: Vector(1000, 2080) } },
-      { box: { pos: Vector(296, 2200), width: 3000, height: 200 } },
       { box: { pos: Vector(200, 400), width: 200, height: 1600 } },
       { box: { pos: Vector(3200, 400), width: 200, height: 2000 } },
       { box: { pos: Vector(200, 1100), width: 400, height: 1300 } },
       { box: { pos: Vector(200, 1400), width: 600, height: 1000 } },
+      { box: { pos: Vector(300, 2200), width: 3000, height: 200 } },
       { box: { pos: Vector(400, 400), width: 3000, height: 200 } },
       { box: { pos: Vector(2950, 2000), width: 450, height: 400 } },
     ],
