@@ -16,6 +16,7 @@ import { Ball } from "./Ball";
 import {
   colorAccent,
   colorBlack,
+  colorBuilding,
   colorLightGray,
   colorWhite,
 } from "./colorUtils";
@@ -50,6 +51,147 @@ let isLoadingNextLevel = false;
 const levelPersistentObjects: any[] = [];
 let fadeinComplete = false; // used to control the fadein out transtiion
 let levelBackground: any = null; // Store the current level's background
+let skyLine: SkyLine | null = null; // City skyline renderer
+
+class SkyLine {
+  private positions: any[] = [];
+  private buildings: any[] = [];
+
+  constructor(positions: any[]) {
+    this.positions = positions;
+    this.generateBuildings();
+  }
+
+  private generateBuildings() {
+    if (!this.positions || this.positions.length === 0) return;
+
+    // Calculate bounds of the background polygon
+    const minX = Math.min(...this.positions.map((p: any) => p.x));
+    const maxX = Math.max(...this.positions.map((p: any) => p.x));
+    const minY = Math.min(...this.positions.map((p: any) => p.y));
+    const maxY = Math.max(...this.positions.map((p: any) => p.y));
+
+    const groundLevel = maxY + 50; // Move buildings 100px down (was maxY - 50)
+    const maxBuildingHeight = (maxY - minY) * 0.5; // Max height is half the background height
+
+    this.buildings = [];
+
+    let currentX = minX;
+    // Generate buildings across the width with varying widths
+    while (currentX < maxX) {
+      // Varying building widths with increased max width
+      const buildingWidth = 100 + Math.random() * 250; // Random width between 100-350px (increased from 120-280px)
+      const buildingSpacing = -20 + Math.random() * 55; // Random spacing between -20px to 15px
+
+      // Building height is limited to half the background height maximum
+      const heightPercent = 0.3 + Math.random() * 0.7; // 30% to 100% of max allowed height
+      const buildingHeight = maxBuildingHeight * heightPercent;
+      const buildingTop = groundLevel - buildingHeight;
+
+      // Generate fewer, larger windows for this building
+      const windows = [];
+      const windowSize = 12; // Larger windows
+      const windowSpacing = 30; // More space between windows
+
+      for (
+        let wy = buildingTop + 20;
+        wy < groundLevel - 20;
+        wy += windowSpacing
+      ) {
+        for (
+          let wx = currentX + 20;
+          wx < currentX + buildingWidth - 20;
+          wx += windowSpacing
+        ) {
+          if (Math.random() > 0.4) {
+            // 60% chance of window being lit (slightly fewer)
+            windows.push({ x: wx, y: wy, size: windowSize });
+          }
+        }
+      }
+
+      this.buildings.push({
+        x: currentX,
+        top: buildingTop,
+        width: buildingWidth,
+        height: buildingHeight,
+        windows,
+      });
+
+      currentX += buildingWidth + buildingSpacing;
+    }
+  }
+
+  render(
+    context: CanvasRenderingContext2D,
+    playerPos?: { x: number; y: number }
+  ) {
+    if (
+      !this.positions ||
+      this.positions.length === 0 ||
+      this.buildings.length === 0
+    )
+      return;
+
+    // Calculate parallax offset based on player position
+    let parallaxOffset = 0;
+    if (playerPos) {
+      // Subtle parallax effect: move buildings 1/8th the distance of player movement
+      // Use a reference point (like level center) to calculate relative movement
+      const levelCenterX =
+        (Math.min(...this.positions.map((p: any) => p.x)) +
+          Math.max(...this.positions.map((p: any) => p.x))) /
+        2;
+      parallaxOffset = (playerPos.x - levelCenterX) * -0.025; // 2.5% of player movement
+    }
+
+    // Set up clipping path using the same coordinates as the background
+    context.save();
+    context.beginPath();
+    context.moveTo(this.positions[0].x, this.positions[0].y);
+    for (let i = 1; i < this.positions.length; i++) {
+      context.lineTo(this.positions[i].x, this.positions[i].y);
+    }
+    context.closePath();
+    context.clip();
+
+    // Draw cached buildings with parallax offset
+    this.renderCachedBuildings(context, parallaxOffset);
+
+    context.restore();
+  }
+
+  private renderCachedBuildings(
+    context: CanvasRenderingContext2D,
+    parallaxOffset: number = 0
+  ) {
+    context.fillStyle = colorBuilding;
+
+    // Draw each cached building
+    for (const building of this.buildings) {
+      // Draw building rectangle with parallax offset
+      context.fillRect(
+        building.x + parallaxOffset,
+        building.top,
+        building.width,
+        building.height
+      );
+
+      // Draw windows using their stored size with parallax offset
+      context.fillStyle = colorLightGray;
+      for (const window of building.windows) {
+        context.fillRect(
+          window.x + parallaxOffset,
+          window.y,
+          window.size,
+          window.size
+        );
+      }
+
+      context.fillStyle = colorBuilding;
+    }
+  }
+}
 
 const mainMenuObjects: any = [];
 const selectLevelObjects: any = [];
@@ -161,29 +303,24 @@ const mainLoop = GameLoop({
 });
 
 function renderBackgrounds(context: CanvasRenderingContext2D) {
-  // Render the level background if it exists
-  if (
-    levelBackground &&
-    levelBackground.positions &&
-    levelBackground.positions.length > 0
-  ) {
+  // First render the original background polygon
+  if (levelBackground && levelBackground.positions) {
     context.save();
-
-    // Create a vertical gradient - we'll use the bounding box of the polygon
     const positions = levelBackground.positions;
     context.fillStyle = colorLightGray;
-    // Draw the polygon using the positions array
     context.beginPath();
     context.moveTo(positions[0].x, positions[0].y);
-
     for (let i = 1; i < positions.length; i++) {
       context.lineTo(positions[i].x, positions[i].y);
     }
-
     context.closePath();
     context.fill();
-
     context.restore();
+  }
+
+  // Then render the skyline on top with player position for parallax
+  if (skyLine && _player) {
+    skyLine.render(context, { x: _player.pos.x, y: _player.pos.y });
   }
 }
 function destroySelectLevelObjects() {
@@ -243,6 +380,12 @@ async function startLevel(scene: SceneId = SceneId.Level, levelId: number) {
   _goal = goal;
   _objects = gameObjects;
   levelBackground = background; // Store the background
+
+  // Create skyline with background positions
+  if (background && background.positions) {
+    skyLine = new SkyLine(background.positions);
+  }
+
   _objects.splice(0, 0, _player);
   _objects.splice(0, 0, _goal);
 
