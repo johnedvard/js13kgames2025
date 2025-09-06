@@ -9,4 +9,5 @@ export const enum GameObjectType {
   Ball = "b",
   MainMenu = "m",
   Text = "t",
+  Laser = "l",
 }

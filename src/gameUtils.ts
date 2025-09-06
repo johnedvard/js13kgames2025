@@ -7,6 +7,7 @@ import { Pickup } from "./Pickup";
 import { GameEvent } from "./GameEvent";
 import { Ball } from "./Ball";
 import { Vector } from "./Vector";
+import { Laser } from "./Laser";
 
 // Circle to rectangle collision detection helper
 function isCircleRectangleColliding(
@@ -142,6 +143,7 @@ export function handleOtherCollisions(objects: MyGameEntity[]): void {
           }
         }
       });
+    } else if (o.type == GameObjectType.Laser) {
     }
   }
 }
@@ -153,6 +155,7 @@ export function handlePlayerCollisions(
   // Check collisions between player (circle) and platforms (rectangles)
   for (const o of objects) {
     if (o == player) continue;
+
     if (
       isCircleRectangleColliding(
         player.pos.add(Vector(-player.radius, player.radius)), // Circle center
@@ -172,6 +175,8 @@ export function handlePlayerCollisions(
         emit(GameEvent.kill);
       } else if (o.type == GameObjectType.Goal) {
         emit(GameEvent.goal);
+      } else if (o.type == GameObjectType.Laser) {
+        if ((o as Laser).isActive) emit(GameEvent.kill);
       }
     }
   }

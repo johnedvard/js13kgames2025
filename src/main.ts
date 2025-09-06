@@ -23,6 +23,7 @@ import {
 import { MainMenu } from "./MainMenu";
 import { playDead, playGoal } from "./audio";
 import { MyVector, Vector } from "./Vector";
+import { Laser } from "./Laser";
 
 const { canvas } = init("g");
 const { canvas: transitionCanvas } = init("t");
@@ -386,6 +387,7 @@ async function startLevel(scene: SceneId = SceneId.Level, levelId: number) {
     skyLine = new SkyLine(background.positions);
   }
 
+  _objects.splice(0, 0, new Laser(Vector(100, 150), Vector(100, -740)));
   _objects.splice(0, 0, _player);
   _objects.splice(0, 0, _goal);
 
