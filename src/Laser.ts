@@ -1,7 +1,7 @@
 import { MyGameEntity } from "./MyGameEntity";
 import { Vector, MyVector } from "./Vector";
 import { GameObjectType } from "./GameObjectType";
-import { colorAccent, colorBlack, colorWhite } from "./colorUtils";
+import { colorBlack } from "./colorUtils";
 
 export class Laser implements MyGameEntity {
   type = GameObjectType.Laser;
@@ -41,24 +41,22 @@ export class Laser implements MyGameEntity {
     // Assume points are either on same X-axis (horizontal) or same Y-axis (vertical)
     const deltaX = Math.abs(this.endPoint.x - this.startPoint.x);
     const deltaY = Math.abs(this.endPoint.y - this.startPoint.y);
-    const offsetPos = Vector(0, 0);
+    const offsetPosX = 20;
 
     if (deltaX > deltaY) {
       // Horizontal laser - width is the distance, height is the beam width
       this.width = deltaX;
-      this.height = this.beamWidth; // Use max beam width for collision
-      offsetPos.y = -this.beamWidth / 2;
+      this.height = 5;
     } else {
       // Vertical laser - height is the distance, width is the beam width
-      this.width = this.beamWidth; // Use max beam width for collision
+      this.width = 5;
       this.height = deltaY;
-      offsetPos.x = -this.beamWidth / 2;
     }
 
     // Set position to the top-left corner of the bounding box
     this.pos = Vector(
-      Math.min(this.startPoint.x + offsetPos.x, this.endPoint.x + offsetPos.x),
-      Math.min(this.startPoint.y + offsetPos.y, this.endPoint.y + offsetPos.y)
+      Math.min(this.startPoint.x, this.endPoint.x) - offsetPosX,
+      Math.min(this.startPoint.y, this.endPoint.y)
     );
   }
 

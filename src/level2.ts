@@ -2,31 +2,26 @@ import { Vector } from "./Vector";
 
 export default function getLevel() {
   return {
-    playerPos: Vector(400, -500),
-    goalPos: Vector(-250, 120),
+    playerPos: Vector(1650, 750),
+    goalPos: Vector(1000, 1370),
     background: {
       positions: [
-        Vector(-490, -940),
-        Vector(-490 + 1100 * 3 - 20, -940),
-        Vector(-490 + 1100 * 3 - 20, -940 + 1100),
-        Vector(-490, -940 + 1100),
+        Vector(760, 310),
+        Vector(4040, 310),
+        Vector(4040, 1410),
+        Vector(760, 1410),
       ],
     },
     objects: [
-      // ceiling wall
-      { box: { pos: Vector(-500, -950), width: 1100 * 3, height: 200 } },
-      // left wall
-      { box: { pos: Vector(-500, -750), width: 200, height: 1100 } },
-      { pickup: { pos: Vector(100, -200) } },
-      { pickup: { pos: Vector(1100, -200) } },
-      { pickup: { pos: Vector(2100, -200) } },
-      // floor
-      { box: { pos: Vector(-500, 150), width: 1100 * 3, height: 200 } },
-      // right wall
-      { box: { pos: Vector(1500 + 1100, -750), width: 200, height: 1100 } },
-
-      { ropeContactPoint: { pos: Vector(700, -500) } },
-      { ropeContactPoint: { pos: Vector(1800, -500) } },
+      { box: { pos: Vector(750, 300), width: 3300, height: 200 } },
+      { box: { pos: Vector(750, 500), width: 200, height: 1100 } },
+      { pickup: { pos: Vector(1350, 1050) } },
+      { pickup: { pos: Vector(2350, 1050) } },
+      { pickup: { pos: Vector(3350, 1050) } },
+      { box: { pos: Vector(750, 1400), width: 3300, height: 200 } },
+      { box: { pos: Vector(3850, 500), width: 200, height: 1100 } },
+      { ropeContactPoint: { pos: Vector(1950, 750) } },
+      { ropeContactPoint: { pos: Vector(3050, 750) } },
     ],
   };
 }

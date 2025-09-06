@@ -26,6 +26,9 @@ import level11 from "./level11";
 import level12 from "./level12";
 import level13 from "./level13";
 import level14 from "./level14";
+import level15 from "./level15";
+import level16 from "./level16";
+import { Laser } from "./Laser";
 
 // Keep an odd number of levels to make it work.
 export const levels: Array<() => LevelObject> = [
@@ -43,6 +46,8 @@ export const levels: Array<() => LevelObject> = [
   level12,
   level13,
   level14,
+  level16,
+  level15,
   levelFinal,
 ];
 
@@ -89,6 +94,13 @@ export function initLevel(camera: Camera, levelId = 1) {
         colorBlack
       );
       gameObjects.push(text);
+    } else if (object.laser) {
+      gameObjects.push(
+        new Laser(
+          Vector(object.laser.startPoint.x, object.laser.startPoint.y),
+          Vector(object.laser.endPoint.x, object.laser.endPoint.y)
+        )
+      );
     }
   });
   return { player, goal, gameObjects, background: level.background };
