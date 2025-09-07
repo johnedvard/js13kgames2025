@@ -154,11 +154,6 @@ export class Laser implements MyGameEntity {
     // Only render main beam if there's something to show (beam progress or fade progress)
     context.restore();
 
-    // Skip rendering beam segments if beam is at full length (performance optimization)
-    if (this.isActive && this.beamProgress >= 1) {
-      return;
-    }
-
     // Calculate the beam length - simplified for horizontal/vertical
     const beamLength = totalLength;
 

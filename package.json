@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:poki": "npm run build -- --mode=poki",
-    "build:roadroller": "npm run build && npx roadroller dist/index.js -o dist/index.js",
+    "build:roadroller": "npm run build && npx roadroller dist/index.js -o dist/index.js --optimize 2",
     "preview": "vite preview",
     "zipDist": "node --loader ts-node/esm zipDist.ts"
   },
