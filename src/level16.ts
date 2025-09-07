@@ -13,7 +13,6 @@ export default function getLevel() {
       ],
     },
     objects: [
-      { shuriken: { pos: Vector(2044, 2464) } },
       { pickup: { pos: Vector(1524, 932) } },
       { pickup: { pos: Vector(364, 864) } },
       { pickup: { pos: Vector(596, 2404) } },

@@ -37,19 +37,16 @@ export class Laser implements MyGameEntity {
     this.startPoint = startPoint;
     this.endPoint = endPoint;
 
-    // Calculate width and height based on start and end points
-    // Assume points are either on same X-axis (horizontal) or same Y-axis (vertical)
-    const deltaX = Math.abs(this.endPoint.x - this.startPoint.x);
-    const deltaY = Math.abs(this.endPoint.y - this.startPoint.y);
+    // Simplified: assume perfectly horizontal or vertical lasers
+    const isHorizontal = this.startPoint.y === this.endPoint.y;
 
-    if (deltaX > deltaY) {
-      // Horizontal laser - width is the distance, height is the beam width
-      this.width = deltaX;
+    if (isHorizontal) {
+      this.width = Math.abs(this.endPoint.x - this.startPoint.x);
       this.height = 5;
     } else {
-      // Vertical laser - height is the distance, width is the beam width
+      // Vertical
       this.width = 5;
-      this.height = deltaY;
+      this.height = Math.abs(this.endPoint.y - this.startPoint.y);
     }
 
     // Set position to the top-left corner of the bounding box
@@ -98,14 +95,23 @@ export class Laser implements MyGameEntity {
   render(context: CanvasRenderingContext2D) {
     context.save();
 
-    // Always render the first 10px of the red line
-    const deltaX = this.endPoint.x - this.startPoint.x;
-    const deltaY = this.endPoint.y - this.startPoint.y;
-    const totalLength = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    const tenPixelRatio = Math.min(1, 15 / totalLength); // Ensure we don't exceed the full length
+    // Simplified: use direct distance calculation for horizontal/vertical
+    const isHorizontal = this.startPoint.y === this.endPoint.y;
+    const totalLength = isHorizontal
+      ? Math.abs(this.endPoint.x - this.startPoint.x)
+      : Math.abs(this.endPoint.y - this.startPoint.y);
 
-    const tenPixelEndX = this.startPoint.x + deltaX * tenPixelRatio;
-    const tenPixelEndY = this.startPoint.y + deltaY * tenPixelRatio;
+    // Always render the first 10px of the connection point
+    const tenPixelRatio = Math.min(1, 15 / totalLength);
+
+    const tenPixelEndX = isHorizontal
+      ? this.startPoint.x +
+        (this.endPoint.x - this.startPoint.x) * tenPixelRatio
+      : this.startPoint.x;
+    const tenPixelEndY = isHorizontal
+      ? this.startPoint.y
+      : this.startPoint.y +
+        (this.endPoint.y - this.startPoint.y) * tenPixelRatio;
 
     // Use the maximum beam width (same as the main beam's start width)
     const maxWidth = this.beamWidth * 3;
@@ -118,10 +124,16 @@ export class Laser implements MyGameEntity {
     context.lineTo(tenPixelEndX, tenPixelEndY);
     context.stroke();
 
-    // Always render the last 15px of the red line (second connection point)
-    const fifteenPixelRatio = Math.min(1, 15 / totalLength); // Ensure we don't exceed the full length
-    const lastFifteenStartX = this.endPoint.x - deltaX * fifteenPixelRatio;
-    const lastFifteenStartY = this.endPoint.y - deltaY * fifteenPixelRatio;
+    // Always render the last 15px connection point
+    const fifteenPixelRatio = Math.min(1, 15 / totalLength);
+    const lastFifteenStartX = isHorizontal
+      ? this.endPoint.x -
+        (this.endPoint.x - this.startPoint.x) * fifteenPixelRatio
+      : this.endPoint.x;
+    const lastFifteenStartY = isHorizontal
+      ? this.endPoint.y
+      : this.endPoint.y -
+        (this.endPoint.y - this.startPoint.y) * fifteenPixelRatio;
 
     context.beginPath();
     context.moveTo(lastFifteenStartX, lastFifteenStartY);
@@ -140,22 +152,28 @@ export class Laser implements MyGameEntity {
     }
 
     // Only render main beam if there's something to show (beam progress or fade progress)
-    if (this.beamProgress <= 0 && this.fadeProgress <= 0) {
-      context.restore();
+    context.restore();
+
+    // Skip rendering beam segments if beam is at full length (performance optimization)
+    if (this.isActive && this.beamProgress >= 1) {
       return;
     }
 
-    // Calculate the beam length for tapering effect
-    const dx = this.endPoint.x - this.startPoint.x;
-    const dy = this.endPoint.y - this.startPoint.y;
-    const beamLength = Math.sqrt(dx * dx + dy * dy);
+    // Calculate the beam length - simplified for horizontal/vertical
+    const beamLength = totalLength;
 
     // Use beam progress for growth, but allow full beam during fade-out
     const renderProgress = this.isActive ? this.beamProgress : 1;
 
-    // Calculate current end point based on render progress
-    const currentEndX = this.startPoint.x + dx * renderProgress;
-    const currentEndY = this.startPoint.y + dy * renderProgress;
+    // Calculate current end point based on render progress - simplified
+    const currentEndX = isHorizontal
+      ? this.startPoint.x +
+        (this.endPoint.x - this.startPoint.x) * renderProgress
+      : this.startPoint.x;
+    const currentEndY = isHorizontal
+      ? this.startPoint.y
+      : this.startPoint.y +
+        (this.endPoint.y - this.startPoint.y) * renderProgress;
     const currentLength = beamLength * renderProgress;
 
     // Create multiple segments for tapering effect
@@ -173,8 +191,7 @@ export class Laser implements MyGameEntity {
 
       // Calculate tapered width - starts wide, quickly goes to default
       // Use exponential decay for quick tapering
-      const startWidth = this.beamWidth * 3; // Start 3x wider
-      const baseWidth = startWidth;
+      const baseWidth = this.beamWidth * 3; // Start 3x wider
 
       // Draw main beam segment
       context.strokeStyle = "#f00";
@@ -187,11 +204,6 @@ export class Laser implements MyGameEntity {
       // Draw brighter core beam
       context.strokeStyle = "#f44";
       context.lineWidth = baseWidth * this.fadeProgress * 0.5;
-
-      context.beginPath();
-      context.moveTo(x1, y1);
-      context.lineTo(x2, y2);
-      context.stroke();
 
       context.beginPath();
       context.moveTo(x1, y1);

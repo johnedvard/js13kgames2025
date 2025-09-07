@@ -26,7 +26,7 @@ export class MainMenu implements MyGameEntity {
   height = 800;
   radius = 0;
   state: MainMenuState = "v";
-  canvas: HTMLCanvasElement | null = null;
+  canvas: HTMLCanvasElement;
 
   // Scrolling properties
   scrollOffset = 0; // Current scroll position
@@ -61,26 +61,24 @@ export class MainMenu implements MyGameEntity {
   pressedScrollButton: "u" | "d" | null = null;
   isMouseDown = false; // Track if mouse is currently held down
 
-  constructor(canvas?: HTMLCanvasElement) {
-    this.canvas = canvas || null;
+  constructor(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
     this.totalLevels = numLevels();
     this.updatePosition();
     this.createOffscreenCanvas();
   }
 
   updatePosition() {
-    if (this.canvas) {
-      // Position the main menu at the top of the canvas
-      this.pos = Vector(
-        (this.canvas.width - this.canvas?.width! * 0.8) / 2, // Centered horizontally
-        0 // At the top of the canvas
-      );
+    // Position the main menu at the top of the canvas
+    this.pos = Vector(
+      (this.canvas.width - this.canvas?.width! * 0.8) / 2, // Centered horizontally
+      0 // At the top of the canvas
+    );
 
-      // Calculate scroll area height (visible area for buttons)
-      this.scrollAreaHeight =
-        this.maxVisibleButtons * this.buttonHeight +
-        (this.maxVisibleButtons - 1) * this.buttonSpacing;
-    }
+    // Calculate scroll area height (visible area for buttons)
+    this.scrollAreaHeight =
+      this.maxVisibleButtons * this.buttonHeight +
+      (this.maxVisibleButtons - 1) * this.buttonSpacing;
   }
   createOffscreenCanvas() {
     // Calculate total content height

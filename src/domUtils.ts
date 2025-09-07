@@ -1,4 +1,3 @@
-let resizeTimeout: number | undefined;
 let gameCanvases: HTMLCanvasElement[];
 
 function scaleCanvas() {
@@ -15,13 +14,12 @@ function scaleCanvas() {
     canvas.style.top = "0";
 
     // Scale the canvas context to match the device pixel ratio and resolution multiplier
-    const context = canvas.getContext("2d");
-    if (context) {
-      context.scale(
-        devicePixelRatio * resolutionMultiplier,
-        devicePixelRatio * resolutionMultiplier
-      );
-    }
+    const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+
+    context.scale(
+      devicePixelRatio * resolutionMultiplier,
+      devicePixelRatio * resolutionMultiplier
+    );
   });
 }
 
@@ -30,18 +28,13 @@ export function listenForResize(
   callbackFunctions?: Function[]
 ) {
   gameCanvases = allCanvas;
-  function debouncedResize() {
-    if (resizeTimeout) {
-      clearTimeout(resizeTimeout);
-    }
-    resizeTimeout = window.setTimeout(() => {
-      scaleCanvas();
-      callbackFunctions?.forEach((callback) => callback());
-    }, 50);
+  function resize() {
+    scaleCanvas();
+    callbackFunctions?.forEach((callback) => callback());
   }
 
   // Listen for resize events
-  window.addEventListener("resize", debouncedResize);
+  window.addEventListener("resize", resize);
   scaleCanvas();
   callbackFunctions?.forEach((callback) => callback());
 }

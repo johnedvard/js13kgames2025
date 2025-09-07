@@ -10,9 +10,9 @@ export class Box implements MyGameEntity {
   type = GameObjectType.Platform;
   canBounce: boolean = false;
   // Animation properties for bounce effect
-  strokeWidth: number = 5;
-  maxStrokeWidth: number = 20;
-  minStrokeWidth: number = 3;
+  strokeWidth: number = 10;
+  maxStrokeWidth: number = 35;
+  minStrokeWidth: number = 5;
   bounceDecay: number = 0.8;
 
   constructor(
@@ -47,34 +47,18 @@ export class Box implements MyGameEntity {
     context.fillStyle = colorBlack;
     context.fillRect(this.pos.x + 14, this.pos.y + 14, this.width, this.height);
 
-    context.fillStyle = colorWall; // cat noir color
-    context.fillRect(this.pos.x, this.pos.y, this.width, this.height);
-
-    // Optimized white border for Safari - use fillRect instead of strokeRect
     if (this.canBounce) {
-      const borderWidth = Math.round(this.strokeWidth); // Round for pixel-perfect rendering
       context.fillStyle = colorWhite;
-
-      // Draw border as four rectangles instead of using strokeRect
-      // Top border
-      context.fillRect(this.pos.x, this.pos.y, this.width, borderWidth);
-      // Bottom border
       context.fillRect(
-        this.pos.x,
-        this.pos.y + this.height - borderWidth,
-        this.width,
-        borderWidth
-      );
-      // Left border
-      context.fillRect(this.pos.x, this.pos.y, borderWidth, this.height);
-      // Right border
-      context.fillRect(
-        this.pos.x + this.width - borderWidth,
-        this.pos.y,
-        borderWidth,
-        this.height
+        this.pos.x - this.strokeWidth / 2,
+        this.pos.y - this.strokeWidth / 2,
+        this.width + this.strokeWidth,
+        this.height + this.strokeWidth
       );
     }
+
+    context.fillStyle = colorWall; // cat noir color
+    context.fillRect(this.pos.x, this.pos.y, this.width, this.height);
 
     context.restore();
   }

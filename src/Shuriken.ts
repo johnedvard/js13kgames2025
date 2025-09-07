@@ -42,23 +42,21 @@ export class Shuriken implements MyGameEntity {
       // SVG path coordinates scaled and positioned
       const scale = 0.5;
       const pathCoords = [
-        { x: 0 * scale, y: 0 * scale },
+        { x: 0, y: 0 },
         { x: -139 * scale, y: 62 * scale },
-        { x: 0 * scale, y: 127 * scale },
-        { x: 0 * scale, y: 95 * scale },
+        { x: 0, y: 127 * scale },
+        { x: 0, y: 95 * scale },
         { x: -11 * scale, y: 62 * scale },
-        { x: 0 * scale, y: 33 * scale },
+        { x: 0, y: 33 * scale },
       ];
 
       // Fill with black
       ctx.fillStyle = colorBlack;
       ctx.beginPath();
       ctx.moveTo(pathCoords[0].x, pathCoords[0].y);
-      ctx.lineTo(pathCoords[1].x, pathCoords[1].y);
-      ctx.lineTo(pathCoords[2].x, pathCoords[2].y);
-      ctx.lineTo(pathCoords[3].x, pathCoords[3].y);
-      ctx.lineTo(pathCoords[4].x, pathCoords[4].y);
-      ctx.lineTo(pathCoords[5].x, pathCoords[5].y);
+      for (let i = 1; i < pathCoords.length; i++) {
+        ctx.lineTo(pathCoords[i].x, pathCoords[i].y);
+      }
       ctx.closePath();
       ctx.fill();
 
@@ -104,9 +102,6 @@ export class Shuriken implements MyGameEntity {
   update(): void {
     // Spin the shuriken continuously
     this.rotation += this.rotationSpeed;
-    if (this.rotation > Math.PI * 2) {
-      this.rotation -= Math.PI * 2;
-    }
   }
 
   render(ctx: CanvasRenderingContext2D): void {

@@ -27,7 +27,7 @@ export default function getLevel() {
         laser: { startPoint: Vector(1400, 510), endPoint: Vector(1400, 1400) },
       },
       {
-        laser: { startPoint: Vector(1710, 1800), endPoint: Vector(2800, 1790) },
+        laser: { startPoint: Vector(2800, 1800), endPoint: Vector(1700, 1800) },
       },
       {
         laser: { startPoint: Vector(3600, 1010), endPoint: Vector(3600, 1400) },
